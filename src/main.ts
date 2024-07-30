@@ -1,12 +1,15 @@
 import './assets/main.css'
 
-import { createApp, ref, type Ref } from 'vue'
+import { createApp, ref } from 'vue'
 import App from './App.vue'
 import { resetParameter } from './utils'
 
 export const app = ref({
   width: window.innerWidth,
   height: window.innerHeight,
+  computeWidth: 1024,
+  computeHeight: 1024,
+  computeDepth: 128,
   fps: 0
 })
 

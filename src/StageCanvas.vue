@@ -5,10 +5,8 @@ import { onMounted, ref, watch } from 'vue'
 import { app, fps, parameter } from './main'
 
 // Shaders
-import updatePositionVS from './glsl/updatePosition.vert?raw'
-import dummyFS from './glsl/dummy.frag?raw'
-import drawVS from './glsl/draw.vert?raw'
-import drawFS from './glsl/draw.frag?raw'
+import computeVS from './glsl/compute.vert?raw'
+import computeFS from './glsl/compute.frag?raw'
 
 //--------------------------------
 // WebGL support functions
@@ -28,11 +26,7 @@ const createShader = (gl: WebGL2RenderingContext, type: GLenum, src: string) => 
   return shader
 }
 
-function createProgram(
-  gl: WebGL2RenderingContext,
-  shaderSources: string[],
-  transformFeedbackVaryings: any
-) {
+function createProgram(gl: WebGL2RenderingContext, shaderSources: string[]) {
   const program = gl.createProgram()
   if (!program) {
     throw new Error()
@@ -44,9 +38,6 @@ function createProgram(
     }
     gl.attachShader(program, shader)
   })
-  if (transformFeedbackVaryings) {
-    gl.transformFeedbackVaryings(program, transformFeedbackVaryings, gl.SEPARATE_ATTRIBS)
-  }
   gl.linkProgram(program)
   // if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
   //     throw new Error(gl.getProgramParameter(program));
@@ -59,15 +50,6 @@ function makeBuffer(gl: WebGL2RenderingContext, bytes: number, usage: GLenum) {
   gl.bindBuffer(gl.ARRAY_BUFFER, buf)
   gl.bufferData(gl.ARRAY_BUFFER, bytes, usage)
   return buf
-}
-
-function makeTransformFeedback(gl: any, buffers: any[]) {
-  const tf = gl.createTransformFeedback()
-  gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, tf)
-  buffers.forEach((buffer, idx) => {
-    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, idx, buffer)
-  })
-  return tf
 }
 
 function makeVertexArray(gl: WebGL2RenderingContext, bufLocPairs: any) {
@@ -87,12 +69,12 @@ function makeVertexArray(gl: WebGL2RenderingContext, bufLocPairs: any) {
   }
   return va
 }
-const offscreenCanvas = new OffscreenCanvas(app.value.width, app.value.height)
-const gl = offscreenCanvas.getContext('webgl2', { alpha: true, premultipliedAlpha: false })
-const canvas = ref()
+
+const computeCanvas = new OffscreenCanvas(app.value.computeWidth, app.value.computeHeight)
+const gl = computeCanvas.getContext('webgl2')
+const drawCanvas = ref()
 onMounted(() => {
-  // const gl = canvas.value.getContext('webgl2')
-  const mainCtx = canvas.value.getContext('bitmaprenderer')
+  const mainCtx = drawCanvas.value.getContext('webgl2')
   if (gl === null) {
     throw new Error()
   }
@@ -100,76 +82,79 @@ onMounted(() => {
   //--------------------------------
   // Create programs
   //--------------------------------
-  const updatePositionProgram = createProgram(
-    gl,
-    [updatePositionVS, dummyFS],
-    ['newPosition', 'newVelocity']
-  )
-  const drawParticlesProgram = createProgram(gl, [drawVS, drawFS], [])
 
-  const updatePositionPrgLocs = {
-    oldPosition: gl.getAttribLocation(updatePositionProgram, 'oldPosition'),
-    canvasDimensions: gl.getUniformLocation(updatePositionProgram, 'canvasDimensions')
-  }
-
-  const drawParticlesProgLocs = {
-    position: gl.getAttribLocation(drawParticlesProgram, 'position'),
-    matrix: gl.getUniformLocation(drawParticlesProgram, 'matrix')
-  }
+  const computeProgram = createProgram(gl, [computeVS, computeFS])
 
   //--------------------------------
   // Create buffers
   //--------------------------------
-  // CPU initial buffers
-  // const numParticles = 1024 * 1024 * 16
-  const numParticles = 1024 * 1024 * 1
-  const bytes = numParticles * dim * 4
 
-  // GPU buffers
-  const position1Buffer = makeBuffer(gl, bytes, gl.DYNAMIC_DRAW)
-  const position2Buffer = makeBuffer(gl, bytes, gl.DYNAMIC_DRAW)
-  const velocity1Buffer = makeBuffer(gl, bytes, gl.DYNAMIC_DRAW)
-  const velocity2Buffer = makeBuffer(gl, bytes, gl.DYNAMIC_DRAW)
+  // Dummy clip for texture computation
+  const buffer = gl.createBuffer()
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
+  gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), // Rectangle
+    gl.STATIC_DRAW
+  )
+  const vao = gl.createVertexArray()
+  gl.bindVertexArray(vao)
 
-  // Vertex arrays for updater
-  const updatePositionVA1 = makeVertexArray(gl, [
-    [position1Buffer, updatePositionPrgLocs.oldPosition]
-  ])
-  const updatePositionVA2 = makeVertexArray(gl, [
-    [position2Buffer, updatePositionPrgLocs.oldPosition]
-  ])
+  // setup our attributes to tell WebGL how to pull
+  // the data from the buffer above to the position attribute
+  const positionLoc = gl.getAttribLocation(computeProgram, 'position')
+  gl.enableVertexAttribArray(positionLoc)
+  gl.vertexAttribPointer(
+    positionLoc,
+    2, // size (num components)
+    gl.FLOAT, // type of data in buffer
+    false, // normalize
+    0, // stride (0 = auto)
+    0 // offset
+  )
 
-  // Vertex arrays for drawer
-  const drawVA1 = makeVertexArray(gl, [[position1Buffer, drawParticlesProgLocs.position]])
-  const drawVA2 = makeVertexArray(gl, [[position2Buffer, drawParticlesProgLocs.position]])
+  // create our source texture
+  const srcTexLoc = gl.getUniformLocation(computeProgram, 'srcTex')
+  const srcWidth = 3
+  const srcHeight = 2
+  const tex = gl.createTexture()
+  gl.bindTexture(gl.TEXTURE_2D, tex)
+  gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1) // see https://webglfundamentals.org/webgl/lessons/webgl-data-textures.html
+  gl.texImage2D(
+    gl.TEXTURE_2D,
+    0, // mip level
+    gl.R8, // internal format
+    srcWidth,
+    srcHeight,
+    0, // border
+    gl.RED, // format
+    gl.UNSIGNED_BYTE, // type
+    new Uint8Array([1, 2, 3, 4, 5, 6])
+  )
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 
-  const tf1 = makeTransformFeedback(gl, [position1Buffer, velocity1Buffer])
-  const tf2 = makeTransformFeedback(gl, [position2Buffer, velocity2Buffer])
+  gl.useProgram(computeProgram)
+  gl.uniform1i(srcTexLoc, 0) // tell the shader the src texture is on texture unit 0
 
-  // For ping-pong buffering
-  let current = {
-    updateVA: updatePositionVA1, // read from position1
-    tf: tf2, // write to position2
-    drawVA: drawVA2, // draw with position2
-    buffer: position2Buffer,
-    velocityBuffer: velocity2Buffer
+  gl.drawArrays(gl.TRIANGLES, 0, 6) // draw 2 triangles (6 vertices)
+
+  // get the result
+  const dstWidth = 3
+  const dstHeight = 2
+  const results = new Uint8Array(dstWidth * dstHeight * 4)
+  gl.readPixels(0, 0, dstWidth, dstHeight, gl.RGBA, gl.UNSIGNED_BYTE, results)
+
+  // print the results
+  for (let i = 0; i < dstWidth * dstHeight; ++i) {
+    console.log(results[i * 4])
   }
-  let next = {
-    updateVA: updatePositionVA2, // read from position2
-    tf: tf1, // write to position1
-    drawVA: drawVA1, // draw with position1
-    buffer: position1Buffer,
-    velocityBuffer: velocity1Buffer
-  }
-
-  // unbind left over stuff
-  gl.bindBuffer(gl.ARRAY_BUFFER, null)
-  gl.bindBuffer(gl.TRANSFORM_FEEDBACK_BUFFER, null)
 
   //================================
   // Frame render function
   //================================
-  let hoge = 0
   let then = 0
   let counter = 0
   let fpsThen = 0
@@ -200,22 +185,6 @@ onMounted(() => {
     //--------------------------------
     // Update positions using transform feedback
     //--------------------------------
-    // compute the new positions
-    gl.useProgram(updatePositionProgram)
-    gl.bindVertexArray(current.updateVA)
-    // gl.uniform2f(updatePositionPrgLocs.canvasDimensions, gl.canvas.width, gl.canvas.height)
-    // gl.uniform1f(updatePositionPrgLocs.gravity, parameter.value.gravity)
-
-    gl.enable(gl.RASTERIZER_DISCARD)
-
-    gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, current.tf)
-    gl.beginTransformFeedback(gl.POINTS)
-    gl.drawArrays(gl.POINTS, 0, numParticles)
-    gl.endTransformFeedback()
-    gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, null)
-
-    // turn on using fragment shaders again
-    gl.disable(gl.RASTERIZER_DISCARD)
 
     //--------------------------------
     // Draw
@@ -225,40 +194,25 @@ onMounted(() => {
     gl.blendFunc(gl.SRC_ALPHA, gl.DST_ALPHA)
     //gl.blendFunc(gl.ONE, gl.ZERO)
     gl.enable(gl.BLEND)
-    gl.useProgram(drawParticlesProgram)
 
-    gl.bindVertexArray(current.drawVA)
-
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
-
-    const matrix = [
-      [1 / canvas.value.width, 0, 0, 0],
-      [0, 1 / canvas.value.height, 0, 0],
-      [0, 0, 1, 0],
-      [0, 0, 0, 1]
-    ].flat()
-    gl.uniformMatrix4fv(drawParticlesProgLocs.matrix, false, matrix)
-    // gl.uniform1f(drawParticlesProgLocs.particleSize, parameter.value.particleSize)
-    // gl.uniform1f(drawParticlesProgLocs.opacity, parameter.value.opacity)
-    // gl.uniform1f(drawParticlesProgLocs.saturation, parameter.value.saturation)
-    // gl.uniform1f(drawParticlesProgLocs.lightness, parameter.value.lightness)
-    gl.drawArrays(gl.POINTS, 0, numParticles)
-
-    //--------------------------------
-    // Copy offscreen render result to main canvas
-    //--------------------------------
-    mainCtx.transferFromImageBitmap(offscreenCanvas.transferToImageBitmap())
+    // gl.useProgram(drawProgram)
+    // gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
+    // const matrix = [
+    //   [1 / canvas.value.width, 0, 0, 0],
+    //   [0, 1 / canvas.value.height, 0, 0],
+    //   [0, 0, 1, 0],
+    //   [0, 0, 0, 1]
+    // ].flat()
+    // gl.uniformMatrix4fv(drawParticlesProgLocs.matrix, false, matrix)
+    // // gl.uniform1f(drawParticlesProgLocs.particleSize, parameter.value.particleSize)
+    // // gl.uniform1f(drawParticlesProgLocs.opacity, parameter.value.opacity)
+    // // gl.uniform1f(drawParticlesProgLocs.saturation, parameter.value.saturation)
+    // // gl.uniform1f(drawParticlesProgLocs.lightness, parameter.value.lightness)
+    // gl.drawArrays(gl.POINTS, 0, numParticles)
 
     //--------------------------------
     // Swap buffers
     //--------------------------------
-    // swap which buffer we will read from
-    // and which one we will write to
-    {
-      const temp = current
-      current = next
-      next = temp
-    }
 
     window.requestAnimationFrame(render)
   }
@@ -276,10 +230,10 @@ onMounted(() => {
   watch(
     [app],
     () => {
-      canvas.value.width = app.value.width
-      canvas.value.height = app.value.height
-      offscreenCanvas.width = app.value.width
-      offscreenCanvas.height = app.value.height
+      drawCanvas.value.width = app.value.width
+      drawCanvas.value.height = app.value.height
+      computeCanvas.width = app.value.width
+      computeCanvas.height = app.value.height
       //   window.requestAnimationFrame(render)
     },
     { deep: true }
@@ -289,6 +243,6 @@ onMounted(() => {
 
 <template>
   <div id="base">
-    <canvas ref="canvas" :width="app.width" :height="app.height"></canvas>
+    <canvas ref="drawCanvas" :width="app.width" :height="app.height"></canvas>
   </div>
 </template>
