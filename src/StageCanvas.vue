@@ -90,7 +90,9 @@ onMounted(() => {
   const computeProgram = createProgram(gl, [computeVS, computeFS])
   const computeProgLocs = {
     time: gl.getUniformLocation(computeProgram, 'time'),
-    computeTex: gl.getUniformLocation(computeProgram, 'computeTex')
+    reset: gl.getUniformLocation(computeProgram, 'reset'),
+    computeTex: gl.getUniformLocation(computeProgram, 'computeTex'),
+    computeSize: gl.getUniformLocation(computeProgram, 'computeSize')
   }
 
   const drawProgram = createProgram(gl, [drawVS, drawFS])
@@ -210,12 +212,15 @@ onMounted(() => {
     gl.uniform1i(computeProgLocs.computeTex, 0)
     gl.viewport(0, 0, app.value.computeWidth, app.value.computeHeight)
     gl.uniform1f(computeProgLocs.time, counter)
+    gl.uniform2f(computeProgLocs.computeSize, app.value.computeWidth, app.value.computeHeight)
     for (let i = 0; i < 2 * 200; i++) {
-      const fb = i % 2 === 0 ? fb1 : fb2
       const tex = i % 2 === 0 ? computeTex2 : computeTex1
+      const fb = i % 2 === 0 ? fb1 : fb2
+      gl.uniform1i(computeProgLocs.reset, app.value.reset ? 1 : 0)
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
       gl.bindTexture(gl.TEXTURE_2D, tex)
       gl.drawArrays(gl.TRIANGLES, 0, 6) // draw 2 triangles (6 vertices)
+      app.value.reset = false
     }
 
     //--------------------------------

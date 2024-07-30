@@ -12,10 +12,11 @@ out vec4 outColor;
 void main() {
     ivec2 texelCoord = ivec2(gl_FragCoord.xy - canvasSize / 2.f + computeSize / 2.f);
     vec4 value = texelFetch(computeTex, texelCoord, 0);
-    float x = 0.f;
-    // for(int i = 0; i < 256; i++) {
-    //     vec4 value = texelFetch(computeTex, texelCoord, 0);
-    //     x += float(i) * value.x;
-    // }
-    outColor = vec4(vec3(sin(value.x / 10000.f)), 1.0f);
+    float a = value.x;
+    if(a > 0.5f) {
+        outColor = vec4(vec3(1.0f), 1.f);
+    } else {
+        // outColor = vec4(vec3(sin(value.x / 10000.f)), 1.0f);
+        outColor = vec4(vec3(0.0f), 1.0f);
+    }
 }
