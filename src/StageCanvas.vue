@@ -73,12 +73,11 @@ function makeVertexArray(gl: WebGL2RenderingContext, bufLocPairs: any) {
 }
 
 // Canvases
-const computeCanvas = new OffscreenCanvas(app.value.computeWidth, app.value.computeHeight)
-const drawCanvas = ref()
+// const computeCanvas = new OffscreenCanvas(app.value.computeWidth, app.value.computeHeight)
+const canvas = ref()
 
 onMounted(() => {
-  const gl = computeCanvas.getContext('webgl2')
-  const drawCtx = drawCanvas.value.getContext('webgl2')
+  const gl: WebGL2RenderingContext = canvas.value.getContext('webgl2')
   if (gl === null) {
     throw new Error()
   }
@@ -88,7 +87,12 @@ onMounted(() => {
   //--------------------------------
 
   const computeProgram = createProgram(gl, [computeVS, computeFS])
-  const drawProgram = createProgram(drawCtx, [drawVS, drawFS])
+  const drawProgram = createProgram(gl, [drawVS, drawFS])
+
+  const drawProgLocs = {
+    canvasSize: gl.getUniformLocation(drawProgram, 'canvasSize'),
+    computeSize: gl.getUniformLocation(drawProgram, 'computeSize')
+  }
 
   //--------------------------------
   // Create buffers
@@ -123,7 +127,7 @@ onMounted(() => {
   }
 
   const computeVA = createDummyClipVA(gl, computeProgram)
-  const drawVA = createDummyClipVA(drawCtx, drawProgram)
+  const drawVA = createDummyClipVA(gl, computeProgram)
 
   // Create textures
   const createTexture = (gl: WebGL2RenderingContext) => {
@@ -150,6 +154,7 @@ onMounted(() => {
   // const srcTex = createTexture(gl)
   // const srcTexLoc = gl.getUniformLocation(computeProgram, 'srcTex')
   const computeTex = createTexture(gl)
+  const computeTexLoc = gl.getUniformLocation(drawProgram, 'computeTex')
 
   // Setup destination texture
   // Create and bind the framebuffer
@@ -159,22 +164,13 @@ onMounted(() => {
   const attachmentPoint = gl.COLOR_ATTACHMENT0
   const level = 0
   gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D, computeTex, level)
+  gl.bindTexture(gl.TEXTURE_2D, null)
 
   gl.useProgram(computeProgram)
   // gl.uniform1i(srcTexLoc, 0) // tell the shader the src texture is on texture unit 0
   gl.bindVertexArray(computeVA)
+  gl.viewport(0, 0, app.value.computeWidth, app.value.computeHeight)
   gl.drawArrays(gl.TRIANGLES, 0, 6) // draw 2 triangles (6 vertices)
-
-  // get the result
-  // const dstWidth = 3
-  // const dstHeight = 2
-  // const results = new Uint8Array(dstWidth * dstHeight * 4)
-  // gl.readPixels(0, 0, dstWidth, dstHeight, gl.RGBA, gl.UNSIGNED_BYTE, results)
-
-  // // print the results
-  // for (let i = 0; i < dstWidth * dstHeight; ++i) {
-  //   console.log(results[i * 4])
-  // }
 
   //================================
   // Frame render function
@@ -182,7 +178,7 @@ onMounted(() => {
   let then = 0
   let counter = 0
   let fpsThen = 0
-  function render(time: number) {
+  const render = (time: number) => {
     if (gl === null) {
       throw new Error()
     }
@@ -202,10 +198,6 @@ onMounted(() => {
       fpsThen = time
     }
 
-    // Clear canvas
-    drawCtx.clearColor(0, 0, 0, 1)
-    drawCtx.clear(drawCtx.COLOR_BUFFER_BIT)
-
     //--------------------------------
     // Update positions using transform feedback
     //--------------------------------
@@ -219,22 +211,26 @@ onMounted(() => {
     //gl.blendFunc(gl.ONE, gl.ZERO)
     // gl.enable(gl.BLEND)
 
-    drawCtx.useProgram(drawProgram)
-    drawCtx.bindVertexArray(drawVA)
-    drawCtx.viewport(0, 0, drawCtx.canvas.width, drawCtx.canvas.height)
-    // const matrix = [
-    //   [1 / canvas.value.width, 0, 0, 0],
-    //   [0, 1 / canvas.value.height, 0, 0],
-    //   [0, 0, 1, 0],
-    //   [0, 0, 0, 1]
-    // ].flat()
+    // Clear canvas
+    gl.useProgram(drawProgram)
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+    gl.clearColor(0, 0, 0, 1)
+    gl.clear(gl.COLOR_BUFFER_BIT)
+    gl.bindTexture(gl.TEXTURE_2D, computeTex)
+
+    gl.uniform1i(computeTexLoc, 0)
+    gl.uniform2f(drawProgLocs.canvasSize, app.value.width, app.value.height)
+    gl.uniform2f(drawProgLocs.computeSize, app.value.computeWidth, app.value.computeHeight)
+
+    gl.bindVertexArray(drawVA)
+    gl.viewport(0, 0, app.value.width, app.value.height)
     // gl.uniformMatrix4fv(drawParticlesProgLocs.matrix, false, matrix)
     // // gl.uniform1f(drawParticlesProgLocs.particleSize, parameter.value.particleSize)
     // // gl.uniform1f(drawParticlesProgLocs.opacity, parameter.value.opacity)
     // // gl.uniform1f(drawParticlesProgLocs.saturation, parameter.value.saturation)
     // // gl.uniform1f(drawParticlesProgLocs.lightness, parameter.value.lightness)
     // gl.drawArrays(gl.POINTS, 0, numParticles)
-    drawCtx.drawArrays(gl.TRIANGLES, 0, 6) // draw 2 triangles (6 vertices)
+    gl.drawArrays(gl.TRIANGLES, 0, 6) // draw 2 triangles (6 vertices)
 
     //--------------------------------
     // Swap buffers
@@ -243,32 +239,12 @@ onMounted(() => {
     window.requestAnimationFrame(render)
   }
 
-  // const animationLoop = () => {
-  //     render()
-  //     window.requestAnimationFrame(animationLoop)
-  // }
-
-  // const draw = () => {
-  // }
-
   window.requestAnimationFrame(render)
-
-  watch(
-    [app],
-    () => {
-      drawCanvas.value.width = app.value.width
-      drawCanvas.value.height = app.value.height
-      // computeCanvas.width = app.value.width
-      // computeCanvas.height = app.value.height
-      //   window.requestAnimationFrame(render)
-    },
-    { deep: true }
-  )
 })
 </script>
 
 <template>
   <div id="base">
-    <canvas ref="drawCanvas" :width="app.width" :height="app.height"></canvas>
+    <canvas ref="canvas" :width="app.width" :height="app.height"></canvas>
   </div>
 </template>
