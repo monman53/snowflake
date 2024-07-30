@@ -81,6 +81,7 @@ onMounted(() => {
   if (gl === null) {
     throw new Error()
   }
+  // console.log(gl.getParameter(gl.MAX_VIEWPORT_DIMS))
 
   //--------------------------------
   // Create programs
@@ -204,16 +205,16 @@ onMounted(() => {
     // Computation
     //--------------------------------
     // for (let i = 0; i < 1000; i++) {
+    gl.useProgram(computeProgram)
+    gl.bindVertexArray(computeVA)
+    gl.uniform1i(computeProgLocs.computeTex, 0)
+    gl.viewport(0, 0, app.value.computeWidth, app.value.computeHeight)
+    gl.uniform1f(computeProgLocs.time, counter)
     for (let i = 0; i < 2 * 200; i++) {
       const fb = i % 2 === 0 ? fb1 : fb2
       const tex = i % 2 === 0 ? computeTex2 : computeTex1
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
-      gl.useProgram(computeProgram)
-      gl.bindVertexArray(computeVA)
       gl.bindTexture(gl.TEXTURE_2D, tex)
-      gl.uniform1i(computeProgLocs.computeTex, 0)
-      gl.viewport(0, 0, app.value.computeWidth, app.value.computeHeight)
-      gl.uniform1f(computeProgLocs.time, counter)
       gl.drawArrays(gl.TRIANGLES, 0, 6) // draw 2 triangles (6 vertices)
     }
 

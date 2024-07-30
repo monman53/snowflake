@@ -9,7 +9,6 @@ export const app = ref({
   height: window.innerHeight,
   computeWidth: 1024,
   computeHeight: 1024,
-  computeDepth: 128,
   fps: 0
 })
 
