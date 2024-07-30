@@ -7,6 +7,7 @@ import { app, fps, parameter } from './main'
 // Shaders
 import computeVS from './glsl/compute.vert?raw'
 import computeFS1 from './glsl/compute1.frag?raw'
+import computeFS2 from './glsl/compute2.frag?raw'
 import computeFS5 from './glsl/compute5.frag?raw'
 import drawVS from './glsl/draw.vert?raw'
 import drawFS from './glsl/draw.frag?raw'
@@ -48,31 +49,6 @@ function createProgram(gl: WebGL2RenderingContext, shaderSources: string[]) {
   return program
 }
 
-function makeBuffer(gl: WebGL2RenderingContext, bytes: number, usage: GLenum) {
-  const buf = gl.createBuffer()
-  gl.bindBuffer(gl.ARRAY_BUFFER, buf)
-  gl.bufferData(gl.ARRAY_BUFFER, bytes, usage)
-  return buf
-}
-
-function makeVertexArray(gl: WebGL2RenderingContext, bufLocPairs: any) {
-  const va = gl.createVertexArray()
-  gl.bindVertexArray(va)
-  for (const [buffer, loc] of bufLocPairs) {
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
-    gl.enableVertexAttribArray(loc)
-    gl.vertexAttribPointer(
-      loc, // attribute location
-      dim, // number of elements
-      gl.FLOAT, // type of data
-      false, // normalize
-      0, // stride (0 = auto)
-      0 // offset
-    )
-  }
-  return va
-}
-
 // Canvases
 // const computeCanvas = new OffscreenCanvas(app.value.computeWidth, app.value.computeHeight)
 const canvas = ref()
@@ -95,6 +71,14 @@ onMounted(() => {
     rho: gl.getUniformLocation(computeProgram1, 'rho'),
     computeTex: gl.getUniformLocation(computeProgram1, 'computeTex'),
     computeSize: gl.getUniformLocation(computeProgram1, 'computeSize')
+  }
+
+  const computeProgram2 = createProgram(gl, [computeVS, computeFS2])
+  const computeProgLocs2 = {
+    time: gl.getUniformLocation(computeProgram2, 'time'),
+    computeTex: gl.getUniformLocation(computeProgram2, 'computeTex'),
+    computeSize: gl.getUniformLocation(computeProgram2, 'computeSize'),
+    kappa: gl.getUniformLocation(computeProgram2, 'kappa')
   }
 
   const computeProgram5 = createProgram(gl, [computeVS, computeFS5])
@@ -144,6 +128,9 @@ onMounted(() => {
   }
 
   const computeVA1 = createDummyClipVA(gl, computeProgram1)
+  const computeVA2 = createDummyClipVA(gl, computeProgram2)
+  // const computeVA3 = createDummyClipVA(gl, computeProgram3)
+  // const computeVA4 = createDummyClipVA(gl, computeProgram4)
   const computeVA5 = createDummyClipVA(gl, computeProgram5)
   const drawVA = createDummyClipVA(gl, drawProgram)
 
@@ -223,7 +210,7 @@ onMounted(() => {
       // (1)
       //--------------------------------
       let tex = computeTex1
-      let fb = fb5
+      let fb = fb2
       gl.useProgram(computeProgram1)
       gl.bindVertexArray(computeVA1)
       gl.uniform1i(computeProgLocs1.computeTex, 0)
@@ -236,6 +223,22 @@ onMounted(() => {
       gl.bindTexture(gl.TEXTURE_2D, tex)
       gl.drawArrays(gl.TRIANGLES, 0, 6)
       app.value.reset = false
+
+      //--------------------------------
+      // (2)
+      //--------------------------------
+      tex = computeTex2
+      fb = fb5
+      gl.useProgram(computeProgram5)
+      gl.bindVertexArray(computeVA2)
+      gl.uniform1i(computeProgLocs2.computeTex, 0)
+      gl.viewport(0, 0, app.value.computeWidth, app.value.computeHeight)
+      gl.uniform1f(computeProgLocs2.time, time)
+      gl.uniform2i(computeProgLocs2.computeSize, app.value.computeWidth, app.value.computeHeight)
+      gl.uniform1f(computeProgLocs2.kappa, parameter.value.kappa)
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
+      gl.bindTexture(gl.TEXTURE_2D, tex)
+      gl.drawArrays(gl.TRIANGLES, 0, 6)
 
       //--------------------------------
       // (5)

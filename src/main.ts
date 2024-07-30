@@ -20,7 +20,7 @@ export const parameter = ref({
   beta: 0.1,
   alpha: 1.0,
   theta: 1.0,
-  kappa: 1.0,
+  kappa: 0.05,
   mu: 1.0,
   gamma: 1.0,
   sigma: 1.0,
@@ -62,7 +62,7 @@ export const parameterProps = ref([
       },
       {
         name: 'kappa',
-        default: 0.1,
+        default: 0.05,
         min: 0,
         max: 1,
         step: 0.001
