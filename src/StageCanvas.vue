@@ -87,8 +87,11 @@ onMounted(() => {
   //--------------------------------
 
   const computeProgram = createProgram(gl, [computeVS, computeFS])
-  const drawProgram = createProgram(gl, [drawVS, drawFS])
+  const computeProgLocs = {
+    time: gl.getUniformLocation(computeProgram, 'time')
+  }
 
+  const drawProgram = createProgram(gl, [drawVS, drawFS])
   const drawProgLocs = {
     canvasSize: gl.getUniformLocation(drawProgram, 'canvasSize'),
     computeSize: gl.getUniformLocation(drawProgram, 'computeSize')
@@ -166,18 +169,11 @@ onMounted(() => {
   gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D, computeTex, level)
   gl.bindTexture(gl.TEXTURE_2D, null)
 
-  gl.useProgram(computeProgram)
-  // gl.uniform1i(srcTexLoc, 0) // tell the shader the src texture is on texture unit 0
-  gl.bindVertexArray(computeVA)
-  gl.viewport(0, 0, app.value.computeWidth, app.value.computeHeight)
-  gl.drawArrays(gl.TRIANGLES, 0, 6) // draw 2 triangles (6 vertices)
-
   //================================
   // Frame render function
   //================================
-  let then = 0
   let counter = 0
-  let fpsThen = 0
+  let then = 0
   const render = (time: number) => {
     if (gl === null) {
       throw new Error()
@@ -187,20 +183,23 @@ onMounted(() => {
     // Calculate FPS
     //--------------------------------
     counter += 1
-    // convert to seconds
-    time *= 0.001
-    // Subtract the previous time from the current time
-    const deltaTime = time - then
-    // Remember the current time for the next frame.
-    then = time
     if (counter % 100 == 0) {
-      fps.value = 100 / (time - fpsThen)
-      fpsThen = time
+      time *= 0.001
+      fps.value = 100 / (time - then)
+      then = time
     }
 
     //--------------------------------
-    // Update positions using transform feedback
+    // Computation
     //--------------------------------
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
+    for (let i = 0; i < 1000; i++) {
+      gl.useProgram(computeProgram)
+      gl.bindVertexArray(computeVA)
+      gl.viewport(0, 0, app.value.computeWidth, app.value.computeHeight)
+      gl.uniform1f(computeProgLocs.time, counter)
+      gl.drawArrays(gl.TRIANGLES, 0, 6) // draw 2 triangles (6 vertices)
+    }
 
     //--------------------------------
     // Draw
@@ -224,12 +223,6 @@ onMounted(() => {
 
     gl.bindVertexArray(drawVA)
     gl.viewport(0, 0, app.value.width, app.value.height)
-    // gl.uniformMatrix4fv(drawParticlesProgLocs.matrix, false, matrix)
-    // // gl.uniform1f(drawParticlesProgLocs.particleSize, parameter.value.particleSize)
-    // // gl.uniform1f(drawParticlesProgLocs.opacity, parameter.value.opacity)
-    // // gl.uniform1f(drawParticlesProgLocs.saturation, parameter.value.saturation)
-    // // gl.uniform1f(drawParticlesProgLocs.lightness, parameter.value.lightness)
-    // gl.drawArrays(gl.POINTS, 0, numParticles)
     gl.drawArrays(gl.TRIANGLES, 0, 6) // draw 2 triangles (6 vertices)
 
     //--------------------------------
