@@ -1,7 +1,7 @@
 <script lang="ts"></script>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 import { app, fps, parameter } from './main'
 
 // Shaders
@@ -88,13 +88,15 @@ onMounted(() => {
 
   const computeProgram = createProgram(gl, [computeVS, computeFS])
   const computeProgLocs = {
-    time: gl.getUniformLocation(computeProgram, 'time')
+    time: gl.getUniformLocation(computeProgram, 'time'),
+    computeTex: gl.getUniformLocation(computeProgram, 'computeTex')
   }
 
   const drawProgram = createProgram(gl, [drawVS, drawFS])
   const drawProgLocs = {
     canvasSize: gl.getUniformLocation(drawProgram, 'canvasSize'),
-    computeSize: gl.getUniformLocation(drawProgram, 'computeSize')
+    computeSize: gl.getUniformLocation(drawProgram, 'computeSize'),
+    computeTex: gl.getUniformLocation(drawProgram, 'computeTex')
   }
 
   //--------------------------------
@@ -135,17 +137,21 @@ onMounted(() => {
   // Create textures
   const createTexture = (gl: WebGL2RenderingContext) => {
     const tex = gl.createTexture()
+    if (tex === null) {
+      throw Error()
+    }
     gl.bindTexture(gl.TEXTURE_2D, tex)
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1) // see https://webglfundamentals.org/webgl/lessons/webgl-data-textures.html
+    gl.getExtension('EXT_color_buffer_float')
     gl.texImage2D(
       gl.TEXTURE_2D,
       0, // mip level
-      gl.RGBA, // internal format
+      gl.RGBA32F, // internal format
       app.value.computeWidth,
       app.value.computeHeight,
       0, // border
       gl.RGBA, // format
-      gl.UNSIGNED_BYTE, // type
+      gl.FLOAT, // type
       null
     )
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
@@ -156,18 +162,23 @@ onMounted(() => {
   }
   // const srcTex = createTexture(gl)
   // const srcTexLoc = gl.getUniformLocation(computeProgram, 'srcTex')
-  const computeTex = createTexture(gl)
-  const computeTexLoc = gl.getUniformLocation(drawProgram, 'computeTex')
+  const computeTex1 = createTexture(gl)
+  const computeTex2 = createTexture(gl)
 
   // Setup destination texture
   // Create and bind the framebuffer
-  const fb = gl.createFramebuffer()
-  gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
-  // attach the texture as the first color attachment
-  const attachmentPoint = gl.COLOR_ATTACHMENT0
-  const level = 0
-  gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D, computeTex, level)
-  gl.bindTexture(gl.TEXTURE_2D, null)
+  const createFrameBuffer = (gl: WebGL2RenderingContext, texture: WebGLTexture) => {
+    const fb = gl.createFramebuffer()
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
+    // attach the texture as the first color attachment
+    const attachmentPoint = gl.COLOR_ATTACHMENT0
+    const level = 0
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D, texture, level)
+    gl.bindTexture(gl.TEXTURE_2D, null)
+    return fb
+  }
+  const fb1 = createFrameBuffer(gl, computeTex1)
+  const fb2 = createFrameBuffer(gl, computeTex2)
 
   //================================
   // Frame render function
@@ -192,10 +203,15 @@ onMounted(() => {
     //--------------------------------
     // Computation
     //--------------------------------
-    gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
-    for (let i = 0; i < 1000; i++) {
+    // for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < 2 * 200; i++) {
+      const fb = i % 2 === 0 ? fb1 : fb2
+      const tex = i % 2 === 0 ? computeTex2 : computeTex1
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
       gl.useProgram(computeProgram)
       gl.bindVertexArray(computeVA)
+      gl.bindTexture(gl.TEXTURE_2D, tex)
+      gl.uniform1i(computeProgLocs.computeTex, 0)
       gl.viewport(0, 0, app.value.computeWidth, app.value.computeHeight)
       gl.uniform1f(computeProgLocs.time, counter)
       gl.drawArrays(gl.TRIANGLES, 0, 6) // draw 2 triangles (6 vertices)
@@ -215,9 +231,9 @@ onMounted(() => {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null)
     gl.clearColor(0, 0, 0, 1)
     gl.clear(gl.COLOR_BUFFER_BIT)
-    gl.bindTexture(gl.TEXTURE_2D, computeTex)
 
-    gl.uniform1i(computeTexLoc, 0)
+    gl.bindTexture(gl.TEXTURE_2D, computeTex1)
+    gl.uniform1i(drawProgLocs.computeTex, 0)
     gl.uniform2f(drawProgLocs.canvasSize, app.value.width, app.value.height)
     gl.uniform2f(drawProgLocs.computeSize, app.value.computeWidth, app.value.computeHeight)
 
