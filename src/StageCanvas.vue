@@ -92,6 +92,7 @@ onMounted(() => {
   const computeProgLocs1 = {
     time: gl.getUniformLocation(computeProgram1, 'time'),
     reset: gl.getUniformLocation(computeProgram1, 'reset'),
+    rho: gl.getUniformLocation(computeProgram1, 'rho'),
     computeTex: gl.getUniformLocation(computeProgram1, 'computeTex'),
     computeSize: gl.getUniformLocation(computeProgram1, 'computeSize')
   }
@@ -217,7 +218,7 @@ onMounted(() => {
     //--------------------------------
     // Computation
     //--------------------------------
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 10; i++) {
       //--------------------------------
       // (1)
       //--------------------------------
@@ -228,8 +229,9 @@ onMounted(() => {
       gl.uniform1i(computeProgLocs1.computeTex, 0)
       gl.viewport(0, 0, app.value.computeWidth, app.value.computeHeight)
       gl.uniform1f(computeProgLocs1.time, time)
-      gl.uniform2f(computeProgLocs1.computeSize, app.value.computeWidth, app.value.computeHeight)
+      gl.uniform2i(computeProgLocs1.computeSize, app.value.computeWidth, app.value.computeHeight)
       gl.uniform1i(computeProgLocs1.reset, app.value.reset ? 1 : 0)
+      gl.uniform1f(computeProgLocs1.rho, parameter.value.rho)
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
       gl.bindTexture(gl.TEXTURE_2D, tex)
       gl.drawArrays(gl.TRIANGLES, 0, 6)
@@ -245,7 +247,7 @@ onMounted(() => {
       gl.uniform1i(computeProgLocs5.computeTex, 0)
       gl.viewport(0, 0, app.value.computeWidth, app.value.computeHeight)
       gl.uniform1f(computeProgLocs5.time, time)
-      gl.uniform2f(computeProgLocs5.computeSize, app.value.computeWidth, app.value.computeHeight)
+      gl.uniform2i(computeProgLocs5.computeSize, app.value.computeWidth, app.value.computeHeight)
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
       gl.bindTexture(gl.TEXTURE_2D, tex)
       gl.drawArrays(gl.TRIANGLES, 0, 6)
