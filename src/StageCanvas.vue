@@ -6,7 +6,8 @@ import { app, fps, parameter } from './main'
 
 // Shaders
 import computeVS from './glsl/compute.vert?raw'
-import computeFS from './glsl/compute.frag?raw'
+import computeFS1 from './glsl/compute1.frag?raw'
+import computeFS5 from './glsl/compute5.frag?raw'
 import drawVS from './glsl/draw.vert?raw'
 import drawFS from './glsl/draw.frag?raw'
 
@@ -87,12 +88,19 @@ onMounted(() => {
   // Create programs
   //--------------------------------
 
-  const computeProgram = createProgram(gl, [computeVS, computeFS])
-  const computeProgLocs = {
-    time: gl.getUniformLocation(computeProgram, 'time'),
-    reset: gl.getUniformLocation(computeProgram, 'reset'),
-    computeTex: gl.getUniformLocation(computeProgram, 'computeTex'),
-    computeSize: gl.getUniformLocation(computeProgram, 'computeSize')
+  const computeProgram1 = createProgram(gl, [computeVS, computeFS1])
+  const computeProgLocs1 = {
+    time: gl.getUniformLocation(computeProgram1, 'time'),
+    reset: gl.getUniformLocation(computeProgram1, 'reset'),
+    computeTex: gl.getUniformLocation(computeProgram1, 'computeTex'),
+    computeSize: gl.getUniformLocation(computeProgram1, 'computeSize')
+  }
+
+  const computeProgram5 = createProgram(gl, [computeVS, computeFS5])
+  const computeProgLocs5 = {
+    time: gl.getUniformLocation(computeProgram5, 'time'),
+    computeTex: gl.getUniformLocation(computeProgram5, 'computeTex'),
+    computeSize: gl.getUniformLocation(computeProgram5, 'computeSize')
   }
 
   const drawProgram = createProgram(gl, [drawVS, drawFS])
@@ -134,8 +142,9 @@ onMounted(() => {
     return vao
   }
 
-  const computeVA = createDummyClipVA(gl, computeProgram)
-  const drawVA = createDummyClipVA(gl, computeProgram)
+  const computeVA1 = createDummyClipVA(gl, computeProgram1)
+  const computeVA5 = createDummyClipVA(gl, computeProgram5)
+  const drawVA = createDummyClipVA(gl, drawProgram)
 
   // Create textures
   const createTexture = (gl: WebGL2RenderingContext) => {
@@ -167,6 +176,7 @@ onMounted(() => {
   // const srcTexLoc = gl.getUniformLocation(computeProgram, 'srcTex')
   const computeTex1 = createTexture(gl)
   const computeTex2 = createTexture(gl)
+  const computeTex5 = createTexture(gl)
 
   // Setup destination texture
   // Create and bind the framebuffer
@@ -182,6 +192,7 @@ onMounted(() => {
   }
   const fb1 = createFrameBuffer(gl, computeTex1)
   const fb2 = createFrameBuffer(gl, computeTex2)
+  const fb5 = createFrameBuffer(gl, computeTex5)
 
   //================================
   // Frame render function
@@ -206,21 +217,38 @@ onMounted(() => {
     //--------------------------------
     // Computation
     //--------------------------------
-    // for (let i = 0; i < 1000; i++) {
-    gl.useProgram(computeProgram)
-    gl.bindVertexArray(computeVA)
-    gl.uniform1i(computeProgLocs.computeTex, 0)
-    gl.viewport(0, 0, app.value.computeWidth, app.value.computeHeight)
-    gl.uniform1f(computeProgLocs.time, counter)
-    gl.uniform2f(computeProgLocs.computeSize, app.value.computeWidth, app.value.computeHeight)
-    for (let i = 0; i < 2 * 200; i++) {
-      const tex = i % 2 === 0 ? computeTex2 : computeTex1
-      const fb = i % 2 === 0 ? fb1 : fb2
-      gl.uniform1i(computeProgLocs.reset, app.value.reset ? 1 : 0)
+    for (let i = 0; i < 100; i++) {
+      //--------------------------------
+      // (1)
+      //--------------------------------
+      let tex = computeTex1
+      let fb = fb5
+      gl.useProgram(computeProgram1)
+      gl.bindVertexArray(computeVA1)
+      gl.uniform1i(computeProgLocs1.computeTex, 0)
+      gl.viewport(0, 0, app.value.computeWidth, app.value.computeHeight)
+      gl.uniform1f(computeProgLocs1.time, time)
+      gl.uniform2f(computeProgLocs1.computeSize, app.value.computeWidth, app.value.computeHeight)
+      gl.uniform1i(computeProgLocs1.reset, app.value.reset ? 1 : 0)
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
       gl.bindTexture(gl.TEXTURE_2D, tex)
-      gl.drawArrays(gl.TRIANGLES, 0, 6) // draw 2 triangles (6 vertices)
+      gl.drawArrays(gl.TRIANGLES, 0, 6)
       app.value.reset = false
+
+      //--------------------------------
+      // (5)
+      //--------------------------------
+      tex = computeTex5
+      fb = fb1
+      gl.useProgram(computeProgram5)
+      gl.bindVertexArray(computeVA5)
+      gl.uniform1i(computeProgLocs5.computeTex, 0)
+      gl.viewport(0, 0, app.value.computeWidth, app.value.computeHeight)
+      gl.uniform1f(computeProgLocs5.time, time)
+      gl.uniform2f(computeProgLocs5.computeSize, app.value.computeWidth, app.value.computeHeight)
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
+      gl.bindTexture(gl.TEXTURE_2D, tex)
+      gl.drawArrays(gl.TRIANGLES, 0, 6)
     }
 
     //--------------------------------
