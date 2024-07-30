@@ -7,6 +7,8 @@ import { app, fps, parameter } from './main'
 // Shaders
 import computeVS from './glsl/compute.vert?raw'
 import computeFS from './glsl/compute.frag?raw'
+import drawVS from './glsl/draw.vert?raw'
+import drawFS from './glsl/draw.frag?raw'
 
 //--------------------------------
 // WebGL support functions
@@ -70,11 +72,13 @@ function makeVertexArray(gl: WebGL2RenderingContext, bufLocPairs: any) {
   return va
 }
 
+// Canvases
 const computeCanvas = new OffscreenCanvas(app.value.computeWidth, app.value.computeHeight)
-const gl = computeCanvas.getContext('webgl2')
 const drawCanvas = ref()
+
 onMounted(() => {
-  const mainCtx = drawCanvas.value.getContext('webgl2')
+  const gl = computeCanvas.getContext('webgl2')
+  const drawCtx = drawCanvas.value.getContext('webgl2')
   if (gl === null) {
     throw new Error()
   }
@@ -84,73 +88,93 @@ onMounted(() => {
   //--------------------------------
 
   const computeProgram = createProgram(gl, [computeVS, computeFS])
+  const drawProgram = createProgram(drawCtx, [drawVS, drawFS])
 
   //--------------------------------
   // Create buffers
   //--------------------------------
 
   // Dummy clip for texture computation
-  const buffer = gl.createBuffer()
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
-  gl.bufferData(
-    gl.ARRAY_BUFFER,
-    new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), // Rectangle
-    gl.STATIC_DRAW
-  )
-  const vao = gl.createVertexArray()
-  gl.bindVertexArray(vao)
+  const createDummyClipVA = (gl: WebGL2RenderingContext, program: WebGLProgram) => {
+    const buffer = gl.createBuffer()
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), // Rectangle
+      gl.STATIC_DRAW
+    )
+    const vao = gl.createVertexArray()
+    gl.bindVertexArray(vao)
 
-  // setup our attributes to tell WebGL how to pull
-  // the data from the buffer above to the position attribute
-  const positionLoc = gl.getAttribLocation(computeProgram, 'position')
-  gl.enableVertexAttribArray(positionLoc)
-  gl.vertexAttribPointer(
-    positionLoc,
-    2, // size (num components)
-    gl.FLOAT, // type of data in buffer
-    false, // normalize
-    0, // stride (0 = auto)
-    0 // offset
-  )
+    // setup our attributes to tell WebGL how to pull
+    // the data from the buffer above to the position attribute
+    const positionLoc = gl.getAttribLocation(program, 'position')
+    gl.enableVertexAttribArray(positionLoc)
+    gl.vertexAttribPointer(
+      positionLoc,
+      2, // size (num components)
+      gl.FLOAT, // type of data in buffer
+      false, // normalize
+      0, // stride (0 = auto)
+      0 // offset
+    )
 
-  // create our source texture
-  const srcTexLoc = gl.getUniformLocation(computeProgram, 'srcTex')
-  const srcWidth = 3
-  const srcHeight = 2
-  const tex = gl.createTexture()
-  gl.bindTexture(gl.TEXTURE_2D, tex)
-  gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1) // see https://webglfundamentals.org/webgl/lessons/webgl-data-textures.html
-  gl.texImage2D(
-    gl.TEXTURE_2D,
-    0, // mip level
-    gl.R8, // internal format
-    srcWidth,
-    srcHeight,
-    0, // border
-    gl.RED, // format
-    gl.UNSIGNED_BYTE, // type
-    new Uint8Array([1, 2, 3, 4, 5, 6])
-  )
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+    return vao
+  }
+
+  const computeVA = createDummyClipVA(gl, computeProgram)
+  const drawVA = createDummyClipVA(drawCtx, drawProgram)
+
+  // Create textures
+  const createTexture = (gl: WebGL2RenderingContext) => {
+    const tex = gl.createTexture()
+    gl.bindTexture(gl.TEXTURE_2D, tex)
+    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1) // see https://webglfundamentals.org/webgl/lessons/webgl-data-textures.html
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0, // mip level
+      gl.RGBA, // internal format
+      app.value.computeWidth,
+      app.value.computeHeight,
+      0, // border
+      gl.RGBA, // format
+      gl.UNSIGNED_BYTE, // type
+      null
+    )
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+    return tex
+  }
+  // const srcTex = createTexture(gl)
+  // const srcTexLoc = gl.getUniformLocation(computeProgram, 'srcTex')
+  const computeTex = createTexture(gl)
+
+  // Setup destination texture
+  // Create and bind the framebuffer
+  const fb = gl.createFramebuffer()
+  gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
+  // attach the texture as the first color attachment
+  const attachmentPoint = gl.COLOR_ATTACHMENT0
+  const level = 0
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D, computeTex, level)
 
   gl.useProgram(computeProgram)
-  gl.uniform1i(srcTexLoc, 0) // tell the shader the src texture is on texture unit 0
-
+  // gl.uniform1i(srcTexLoc, 0) // tell the shader the src texture is on texture unit 0
+  gl.bindVertexArray(computeVA)
   gl.drawArrays(gl.TRIANGLES, 0, 6) // draw 2 triangles (6 vertices)
 
   // get the result
-  const dstWidth = 3
-  const dstHeight = 2
-  const results = new Uint8Array(dstWidth * dstHeight * 4)
-  gl.readPixels(0, 0, dstWidth, dstHeight, gl.RGBA, gl.UNSIGNED_BYTE, results)
+  // const dstWidth = 3
+  // const dstHeight = 2
+  // const results = new Uint8Array(dstWidth * dstHeight * 4)
+  // gl.readPixels(0, 0, dstWidth, dstHeight, gl.RGBA, gl.UNSIGNED_BYTE, results)
 
-  // print the results
-  for (let i = 0; i < dstWidth * dstHeight; ++i) {
-    console.log(results[i * 4])
-  }
+  // // print the results
+  // for (let i = 0; i < dstWidth * dstHeight; ++i) {
+  //   console.log(results[i * 4])
+  // }
 
   //================================
   // Frame render function
@@ -179,8 +203,8 @@ onMounted(() => {
     }
 
     // Clear canvas
-    gl.clearColor(0, 0, 0, 1)
-    gl.clear(gl.COLOR_BUFFER_BIT)
+    drawCtx.clearColor(0, 0, 0, 1)
+    drawCtx.clear(drawCtx.COLOR_BUFFER_BIT)
 
     //--------------------------------
     // Update positions using transform feedback
@@ -191,12 +215,13 @@ onMounted(() => {
     //--------------------------------
     // Color blending
     //gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-    gl.blendFunc(gl.SRC_ALPHA, gl.DST_ALPHA)
+    // gl.blendFunc(gl.SRC_ALPHA, gl.DST_ALPHA)
     //gl.blendFunc(gl.ONE, gl.ZERO)
-    gl.enable(gl.BLEND)
+    // gl.enable(gl.BLEND)
 
-    // gl.useProgram(drawProgram)
-    // gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
+    drawCtx.useProgram(drawProgram)
+    drawCtx.bindVertexArray(drawVA)
+    drawCtx.viewport(0, 0, drawCtx.canvas.width, drawCtx.canvas.height)
     // const matrix = [
     //   [1 / canvas.value.width, 0, 0, 0],
     //   [0, 1 / canvas.value.height, 0, 0],
@@ -209,6 +234,7 @@ onMounted(() => {
     // // gl.uniform1f(drawParticlesProgLocs.saturation, parameter.value.saturation)
     // // gl.uniform1f(drawParticlesProgLocs.lightness, parameter.value.lightness)
     // gl.drawArrays(gl.POINTS, 0, numParticles)
+    drawCtx.drawArrays(gl.TRIANGLES, 0, 6) // draw 2 triangles (6 vertices)
 
     //--------------------------------
     // Swap buffers
@@ -232,8 +258,8 @@ onMounted(() => {
     () => {
       drawCanvas.value.width = app.value.width
       drawCanvas.value.height = app.value.height
-      computeCanvas.width = app.value.width
-      computeCanvas.height = app.value.height
+      // computeCanvas.width = app.value.width
+      // computeCanvas.height = app.value.height
       //   window.requestAnimationFrame(render)
     },
     { deep: true }
