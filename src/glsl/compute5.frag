@@ -9,9 +9,6 @@ uniform ivec2 computeSize;
 
 out vec4 outColor;
 
-float mod289(float x) {
-    return x - floor(x * (1.0f / 289.0f)) * 289.0f;
-}
 vec4 mod289(vec4 x) {
     return x - floor(x * (1.0f / 289.0f)) * 289.0f;
 }
@@ -42,18 +39,19 @@ float noise(vec3 p) {
 }
 
 void main() {
-    ivec2 texelCoord = ivec2(gl_FragCoord.xy);
-    vec4 current = texelFetch(computeTex, texelCoord, 0);
+    ivec2 pos = ivec2(gl_FragCoord.xy);
+    ivec2 center = computeSize / 2;
+    ivec2 posCenter = pos - center;
+    vec4 current = texelFetch(computeTex, pos, 0);
     vec4 next = current;
+    if(abs(posCenter.x + posCenter.y) >= computeSize.x / 2) {
+        outColor = next;
+        return;
+    }
     if(noise(vec3(gl_FragCoord.xy, time)) < 0.5f) {
         next.w = (1.f + sigma) * current.w;
     } else {
         next.w = (1.f - sigma) * current.w;
-    }
-    // if(abs(texelCoord.x + texelCoord.y) > computeSize.x / 2) {
-    if(texelCoord.x > 400) {
-        // next.x = 1.f;
-        outColor = next;
     }
     outColor = next;
 }
