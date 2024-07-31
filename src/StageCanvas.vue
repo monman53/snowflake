@@ -113,7 +113,8 @@ onMounted(() => {
   const drawProgLocs = {
     canvasSize: gl.getUniformLocation(drawProgram, 'canvasSize'),
     computeSize: gl.getUniformLocation(drawProgram, 'computeSize'),
-    computeTex: gl.getUniformLocation(drawProgram, 'computeTex')
+    computeTex: gl.getUniformLocation(drawProgram, 'computeTex'),
+    rot: gl.getUniformLocation(drawProgram, 'rot')
   }
 
   //--------------------------------
@@ -333,6 +334,7 @@ onMounted(() => {
 
     gl.bindTexture(gl.TEXTURE_2D, computeTex1)
     gl.uniform1i(drawProgLocs.computeTex, 0)
+    gl.uniform1f(drawProgLocs.rot, parameter.value.rot)
     gl.uniform2f(drawProgLocs.canvasSize, app.value.width, app.value.height)
     gl.uniform2f(drawProgLocs.computeSize, app.value.computeWidth, app.value.computeHeight)
 

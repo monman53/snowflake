@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
-import { fps, parameter, parameterProps } from './main'
+import { app, fps, parameter, parameterProps } from './main'
 import { humanReadable, randomParameter, resetParameter } from './utils'
 
 type ModeType = 'control' | 'info' | ''
@@ -63,7 +63,8 @@ const mode: Ref<ModeType> = ref('')
         </template>
         <fieldset>
           <legend>Templates</legend>
-          <button @click="resetParameter">reset all</button><br />
+          <button @click="app.reset = true">Clear</button><br />
+          <button @click="resetParameter">Reset parameter</button><br />
           <!-- <button @click="randomParameter">random</button><br /> -->
         </fieldset>
       </div>

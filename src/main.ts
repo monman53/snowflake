@@ -7,8 +7,8 @@ import { resetParameter } from './utils'
 export const app = ref({
   width: window.innerWidth,
   height: window.innerHeight,
-  computeWidth: 1024,
-  computeHeight: 1024,
+  computeWidth: 1 << 10,
+  computeHeight: 1 << 10,
   reset: true,
   fps: 0
 })
@@ -16,6 +16,7 @@ export const app = ref({
 export const fps = ref(0)
 
 export const parameter = ref({
+  rot: 0,
   rho: 1.0,
   beta: 2.2,
   alpha: 1.0,
@@ -32,6 +33,13 @@ export const parameterProps = ref([
     name: 'Parameters',
     visible: false,
     props: [
+      {
+        name: 'rot',
+        default: 1,
+        min: 0,
+        max: 1,
+        step: 0.001
+      },
       {
         name: 'rho',
         default: 0.46,
