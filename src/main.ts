@@ -7,7 +7,7 @@ import { resetAllParameter } from './utils'
 export const app = ref({
   width: window.innerWidth,
   height: window.innerHeight,
-  computeSize: 1 << 10,
+  computeRadius: 1 << 9,
   reset: true,
   pause: false,
   iteration: 0,

@@ -1,7 +1,7 @@
 <script lang="ts"></script>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { app, fps } from './main'
 
 // Shaders
@@ -15,6 +15,10 @@ import computeFS5 from './glsl/compute5.frag?raw'
 import drawVS from './glsl/draw.vert?raw'
 import drawFS from './glsl/draw.frag?raw'
 import { parameter } from './parameters'
+
+const textureSize = computed(() => {
+  return app.value.computeRadius * 2 + 1
+})
 
 //--------------------------------
 // WebGL support functions
@@ -73,21 +77,21 @@ onMounted(() => {
     time: gl.getUniformLocation(computeProgram0, 'time'),
     rho: gl.getUniformLocation(computeProgram0, 'rho'),
     computeTex: gl.getUniformLocation(computeProgram0, 'computeTex'),
-    computeSize: gl.getUniformLocation(computeProgram0, 'computeSize')
+    computeRadius: gl.getUniformLocation(computeProgram0, 'computeRadius')
   }
 
   const computeProgram1 = createProgram(gl, [computeVS, computeFS1])
   const computeProgLocs1 = {
     time: gl.getUniformLocation(computeProgram1, 'time'),
     computeTex: gl.getUniformLocation(computeProgram1, 'computeTex'),
-    computeSize: gl.getUniformLocation(computeProgram1, 'computeSize')
+    computeRadius: gl.getUniformLocation(computeProgram1, 'computeRadius')
   }
 
   const computeProgram2 = createProgram(gl, [computeVS, computeFS2])
   const computeProgLocs2 = {
     time: gl.getUniformLocation(computeProgram2, 'time'),
     computeTex: gl.getUniformLocation(computeProgram2, 'computeTex'),
-    computeSize: gl.getUniformLocation(computeProgram2, 'computeSize'),
+    computeRadius: gl.getUniformLocation(computeProgram2, 'computeRadius'),
     kappa: gl.getUniformLocation(computeProgram2, 'kappa')
   }
 
@@ -95,7 +99,7 @@ onMounted(() => {
   const computeProgLocs3 = {
     time: gl.getUniformLocation(computeProgram3, 'time'),
     computeTex: gl.getUniformLocation(computeProgram3, 'computeTex'),
-    computeSize: gl.getUniformLocation(computeProgram3, 'computeSize'),
+    computeRadius: gl.getUniformLocation(computeProgram3, 'computeRadius'),
     beta: gl.getUniformLocation(computeProgram3, 'beta'),
     alpha: gl.getUniformLocation(computeProgram3, 'alpha'),
     theta: gl.getUniformLocation(computeProgram3, 'theta')
@@ -105,7 +109,7 @@ onMounted(() => {
   const computeProgLocs4 = {
     time: gl.getUniformLocation(computeProgram4, 'time'),
     computeTex: gl.getUniformLocation(computeProgram4, 'computeTex'),
-    computeSize: gl.getUniformLocation(computeProgram4, 'computeSize'),
+    computeRadius: gl.getUniformLocation(computeProgram4, 'computeRadius'),
     mu: gl.getUniformLocation(computeProgram4, 'mu'),
     gamma: gl.getUniformLocation(computeProgram4, 'gamma')
   }
@@ -114,14 +118,14 @@ onMounted(() => {
   const computeProgLocs5 = {
     time: gl.getUniformLocation(computeProgram5, 'time'),
     computeTex: gl.getUniformLocation(computeProgram5, 'computeTex'),
-    computeSize: gl.getUniformLocation(computeProgram5, 'computeSize'),
+    computeRadius: gl.getUniformLocation(computeProgram5, 'computeRadius'),
     sigma: gl.getUniformLocation(computeProgram5, 'sigma')
   }
 
   const drawProgram = createProgram(gl, [drawVS, drawFS])
   const drawProgLocs = {
     canvasSize: gl.getUniformLocation(drawProgram, 'canvasSize'),
-    computeSize: gl.getUniformLocation(drawProgram, 'computeSize'),
+    computeRadius: gl.getUniformLocation(drawProgram, 'computeRadius'),
     computeTex: gl.getUniformLocation(drawProgram, 'computeTex'),
     rot: gl.getUniformLocation(drawProgram, 'rot'),
     lightAngle: gl.getUniformLocation(drawProgram, 'lightAngle'),
@@ -184,8 +188,8 @@ onMounted(() => {
       gl.TEXTURE_2D,
       0, // mip level
       gl.RGBA32F, // internal format
-      app.value.computeSize,
-      app.value.computeSize,
+      textureSize.value,
+      textureSize.value,
       0, // border
       gl.RGBA, // format
       gl.FLOAT, // type
@@ -248,14 +252,14 @@ onMounted(() => {
     //--------------------------------
 
     // Initialize field
-    gl.viewport(0, 0, app.value.computeSize, app.value.computeSize)
+    gl.viewport(0, 0, textureSize.value, textureSize.value)
     if (app.value.reset) {
       let fb = fb1
       gl.useProgram(computeProgram0)
       gl.bindVertexArray(computeVA0)
       gl.uniform1i(computeProgLocs0.computeTex, 0)
       gl.uniform1f(computeProgLocs0.rho, parameter.value.rho)
-      gl.uniform1i(computeProgLocs0.computeSize, app.value.computeSize)
+      gl.uniform1i(computeProgLocs0.computeRadius, app.value.computeRadius)
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
       gl.drawArrays(gl.TRIANGLES, 0, 6)
 
@@ -275,7 +279,7 @@ onMounted(() => {
       gl.bindVertexArray(computeVA1)
       gl.uniform1i(computeProgLocs1.computeTex, 0)
       gl.uniform1f(computeProgLocs1.time, time)
-      gl.uniform1i(computeProgLocs1.computeSize, app.value.computeSize)
+      gl.uniform1i(computeProgLocs1.computeRadius, app.value.computeRadius)
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
       gl.bindTexture(gl.TEXTURE_2D, tex)
       gl.drawArrays(gl.TRIANGLES, 0, 6)
@@ -289,7 +293,7 @@ onMounted(() => {
       gl.bindVertexArray(computeVA2)
       gl.uniform1i(computeProgLocs2.computeTex, 0)
       gl.uniform1f(computeProgLocs2.time, time)
-      gl.uniform1i(computeProgLocs2.computeSize, app.value.computeSize)
+      gl.uniform1i(computeProgLocs2.computeRadius, app.value.computeRadius)
       gl.uniform1f(computeProgLocs2.kappa, parameter.value.kappa)
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
       gl.bindTexture(gl.TEXTURE_2D, tex)
@@ -307,7 +311,7 @@ onMounted(() => {
       gl.uniform1f(computeProgLocs3.beta, parameter.value.beta)
       gl.uniform1f(computeProgLocs3.alpha, parameter.value.alpha)
       gl.uniform1f(computeProgLocs3.theta, parameter.value.theta)
-      gl.uniform1i(computeProgLocs3.computeSize, app.value.computeSize)
+      gl.uniform1i(computeProgLocs3.computeRadius, app.value.computeRadius)
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
       gl.bindTexture(gl.TEXTURE_2D, tex)
       gl.drawArrays(gl.TRIANGLES, 0, 6)
@@ -323,7 +327,7 @@ onMounted(() => {
       gl.uniform1f(computeProgLocs4.time, time)
       gl.uniform1f(computeProgLocs4.mu, parameter.value.mu)
       gl.uniform1f(computeProgLocs4.gamma, parameter.value.gamma)
-      gl.uniform1i(computeProgLocs4.computeSize, app.value.computeSize)
+      gl.uniform1i(computeProgLocs4.computeRadius, app.value.computeRadius)
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
       gl.bindTexture(gl.TEXTURE_2D, tex)
       gl.drawArrays(gl.TRIANGLES, 0, 6)
@@ -337,8 +341,8 @@ onMounted(() => {
       gl.bindVertexArray(computeVA5)
       gl.uniform1i(computeProgLocs5.computeTex, 0)
       gl.uniform1f(computeProgLocs5.time, time)
-      gl.uniform1i(computeProgLocs5.computeSize, app.value.computeSize)
       gl.uniform1f(computeProgLocs5.sigma, parameter.value.sigma)
+      gl.uniform1i(computeProgLocs5.computeRadius, app.value.computeRadius)
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
       gl.bindTexture(gl.TEXTURE_2D, tex)
       gl.drawArrays(gl.TRIANGLES, 0, 6)
@@ -363,7 +367,7 @@ onMounted(() => {
     gl.uniform1f(drawProgLocs.saturation, parameter.value.saturation)
     gl.uniform1f(drawProgLocs.lightness, parameter.value.lightness)
     gl.uniform2f(drawProgLocs.canvasSize, app.value.width, app.value.height)
-    gl.uniform1i(drawProgLocs.computeSize, app.value.computeSize)
+    gl.uniform1i(drawProgLocs.computeRadius, app.value.computeRadius)
 
     gl.bindVertexArray(drawVA)
     gl.viewport(0, 0, app.value.width, app.value.height)
