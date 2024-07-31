@@ -23,8 +23,6 @@ const textureSize = computed(() => {
 //--------------------------------
 // WebGL support functions
 //--------------------------------
-const dim = 4
-
 const createShader = (gl: WebGL2RenderingContext, type: GLenum, src: string) => {
   const shader = gl.createShader(type)
   if (!shader) {
@@ -176,7 +174,7 @@ onMounted(() => {
   const drawVA = createDummyClipVA(gl, drawProgram)
 
   // Create textures
-  const createTexture = (gl: WebGL2RenderingContext) => {
+  const createTexture = (gl: WebGL2RenderingContext, param: GLint = gl.NEAREST) => {
     const tex = gl.createTexture()
     if (tex === null) {
       throw Error()
@@ -195,8 +193,8 @@ onMounted(() => {
       gl.FLOAT, // type
       null
     )
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, param)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, param)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
     return tex
@@ -354,11 +352,7 @@ onMounted(() => {
     //--------------------------------
     // Clear canvas
     gl.useProgram(drawProgram)
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null)
-    gl.clearColor(0, 0, 0, 1)
-    gl.clear(gl.COLOR_BUFFER_BIT)
 
-    gl.bindTexture(gl.TEXTURE_2D, computeTex1)
     gl.uniform1i(drawProgLocs.computeTex, 0)
     gl.uniform1f(drawProgLocs.rot, parameter.value.rot)
     gl.uniform1f(drawProgLocs.lightAngle, parameter.value.lightAngle)
@@ -369,8 +363,13 @@ onMounted(() => {
     gl.uniform2f(drawProgLocs.canvasSize, app.value.width, app.value.height)
     gl.uniform1i(drawProgLocs.computeRadius, app.value.computeRadius)
 
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+    gl.bindTexture(gl.TEXTURE_2D, computeTex1)
     gl.bindVertexArray(drawVA)
     gl.viewport(0, 0, app.value.width, app.value.height)
+
+    gl.clearColor(0, 0, 0, 1)
+    gl.clear(gl.COLOR_BUFFER_BIT)
     gl.drawArrays(gl.TRIANGLES, 0, 6)
 
     // Next frame
