@@ -116,7 +116,10 @@ onMounted(() => {
     computeSize: gl.getUniformLocation(drawProgram, 'computeSize'),
     computeTex: gl.getUniformLocation(drawProgram, 'computeTex'),
     rot: gl.getUniformLocation(drawProgram, 'rot'),
-    lightAngle: gl.getUniformLocation(drawProgram, 'lightAngle')
+    lightAngle: gl.getUniformLocation(drawProgram, 'lightAngle'),
+    hue: gl.getUniformLocation(drawProgram, 'hue'),
+    saturation: gl.getUniformLocation(drawProgram, 'saturation'),
+    lightness: gl.getUniformLocation(drawProgram, 'lightness')
   }
 
   //--------------------------------
@@ -233,7 +236,8 @@ onMounted(() => {
     //--------------------------------
     // Computation
     //--------------------------------
-    for (let i = 0; i < 32; i++) {
+    const numItr = 32
+    for (let i = 0; i < numItr; i++) {
       //--------------------------------
       // (1)
       //--------------------------------
@@ -250,7 +254,10 @@ onMounted(() => {
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
       gl.bindTexture(gl.TEXTURE_2D, tex)
       gl.drawArrays(gl.TRIANGLES, 0, 6)
-      app.value.reset = false
+      if (app.value.reset) {
+        app.value.iteration = 0
+        app.value.reset = false
+      }
 
       //--------------------------------
       // (2)
@@ -319,16 +326,11 @@ onMounted(() => {
       gl.bindTexture(gl.TEXTURE_2D, tex)
       gl.drawArrays(gl.TRIANGLES, 0, 6)
     }
+    app.value.iteration += numItr
 
     //--------------------------------
     // Draw
     //--------------------------------
-    // Color blending
-    //gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-    // gl.blendFunc(gl.SRC_ALPHA, gl.DST_ALPHA)
-    //gl.blendFunc(gl.ONE, gl.ZERO)
-    // gl.enable(gl.BLEND)
-
     // Clear canvas
     gl.useProgram(drawProgram)
     gl.bindFramebuffer(gl.FRAMEBUFFER, null)
@@ -339,17 +341,17 @@ onMounted(() => {
     gl.uniform1i(drawProgLocs.computeTex, 0)
     gl.uniform1f(drawProgLocs.rot, parameter.value.rot)
     gl.uniform1f(drawProgLocs.lightAngle, parameter.value.lightAngle)
+    gl.uniform1f(drawProgLocs.hue, parameter.value.hue)
+    gl.uniform1f(drawProgLocs.saturation, parameter.value.saturation)
+    gl.uniform1f(drawProgLocs.lightness, parameter.value.lightness)
     gl.uniform2f(drawProgLocs.canvasSize, app.value.width, app.value.height)
     gl.uniform2f(drawProgLocs.computeSize, app.value.computeWidth, app.value.computeHeight)
 
     gl.bindVertexArray(drawVA)
     gl.viewport(0, 0, app.value.width, app.value.height)
-    gl.drawArrays(gl.TRIANGLES, 0, 6) // draw 2 triangles (6 vertices)
+    gl.drawArrays(gl.TRIANGLES, 0, 6)
 
-    //--------------------------------
-    // Swap buffers
-    //--------------------------------
-
+    // Next frame
     window.requestAnimationFrame(render)
   }
 

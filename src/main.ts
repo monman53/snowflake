@@ -10,6 +10,7 @@ export const app = ref({
   computeWidth: 1 << 10,
   computeHeight: 1 << 10,
   reset: true,
+  iteration: 0,
   fps: 0
 })
 
@@ -26,7 +27,9 @@ export const parameter = ref({
   mu: 1.0,
   gamma: 1.0,
   sigma: 1.0,
-  hue: 0
+  hue: 0,
+  saturation: 0,
+  lightness: 0
 })
 
 export const parameterProps = ref([
@@ -37,13 +40,6 @@ export const parameterProps = ref([
       {
         name: 'rot',
         default: 1 / 12,
-        min: 0,
-        max: 1,
-        step: 0.0001
-      },
-      {
-        name: 'lightAngle',
-        default: 0,
         min: 0,
         max: 1,
         step: 0.0001
@@ -107,12 +103,33 @@ export const parameterProps = ref([
     ]
   },
   {
-    name: 'Background',
+    name: 'Color',
     visible: false,
     props: [
       {
+        name: 'lightAngle',
+        default: 0,
+        min: 0,
+        max: 1,
+        step: 0.0001
+      },
+      {
         name: 'hue',
-        default: 0.1,
+        default: 0.6,
+        min: 0,
+        max: 1,
+        step: 0.0001
+      },
+      {
+        name: 'saturation',
+        default: 0.4,
+        min: 0,
+        max: 1,
+        step: 0.0001
+      },
+      {
+        name: 'lightness',
+        default: 0.6,
         min: 0,
         max: 1,
         step: 0.0001

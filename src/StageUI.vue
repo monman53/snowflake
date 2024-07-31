@@ -28,6 +28,7 @@ const mode: Ref<ModeType> = ref('')
         <fieldset>
           <legend>Info</legend>
           FPS: {{ humanReadable(fps) }}<br />
+          Iteration: {{ app.iteration }}<br />
         </fieldset>
         <template v-for="category of parameterProps" :key="category.name">
           <fieldset>
