@@ -17,7 +17,7 @@ export const fps = ref(0)
 
 export const parameter = ref({
   rho: 1.0,
-  beta: 0.1,
+  beta: 2.2,
   alpha: 1.0,
   theta: 1.0,
   kappa: 0.05,
@@ -34,56 +34,56 @@ export const parameterProps = ref([
     props: [
       {
         name: 'rho',
-        default: 0.1,
+        default: 0.46,
         min: 0,
         max: 1,
         step: 0.001
       },
       {
         name: 'beta',
-        default: 0.1,
-        min: 0,
-        max: 1,
+        default: 1.3,
+        min: 1.0,
+        max: 5.0,
         step: 0.001
       },
       {
         name: 'alpha',
-        default: 0.1,
+        default: 0.08,
         min: 0,
         max: 1,
         step: 0.001
       },
       {
         name: 'theta',
-        default: 0.1,
+        default: 0.025,
         min: 0,
         max: 1,
         step: 0.001
       },
       {
         name: 'kappa',
-        default: 0.05,
+        default: 0.003,
         min: 0,
         max: 1,
         step: 0.001
       },
       {
         name: 'mu',
-        default: 0.1,
+        default: 0.07,
         min: 0,
         max: 1,
         step: 0.001
       },
       {
         name: 'gamma',
-        default: 0.1,
+        default: 0.00005,
         min: 0,
         max: 1,
         step: 0.001
       },
       {
         name: 'sigma',
-        default: 0.1,
+        default: 0,
         min: 0,
         max: 1,
         step: 0.001

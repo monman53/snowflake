@@ -8,6 +8,7 @@ import { app, fps, parameter } from './main'
 import computeVS from './glsl/compute.vert?raw'
 import computeFS1 from './glsl/compute1.frag?raw'
 import computeFS2 from './glsl/compute2.frag?raw'
+import computeFS3 from './glsl/compute3.frag?raw'
 import computeFS5 from './glsl/compute5.frag?raw'
 import drawVS from './glsl/draw.vert?raw'
 import drawFS from './glsl/draw.frag?raw'
@@ -81,6 +82,16 @@ onMounted(() => {
     kappa: gl.getUniformLocation(computeProgram2, 'kappa')
   }
 
+  const computeProgram3 = createProgram(gl, [computeVS, computeFS3])
+  const computeProgLocs3 = {
+    time: gl.getUniformLocation(computeProgram3, 'time'),
+    computeTex: gl.getUniformLocation(computeProgram3, 'computeTex'),
+    computeSize: gl.getUniformLocation(computeProgram3, 'computeSize'),
+    beta: gl.getUniformLocation(computeProgram3, 'beta'),
+    alpha: gl.getUniformLocation(computeProgram3, 'alpha'),
+    theta: gl.getUniformLocation(computeProgram3, 'theta')
+  }
+
   const computeProgram5 = createProgram(gl, [computeVS, computeFS5])
   const computeProgLocs5 = {
     time: gl.getUniformLocation(computeProgram5, 'time'),
@@ -129,7 +140,7 @@ onMounted(() => {
 
   const computeVA1 = createDummyClipVA(gl, computeProgram1)
   const computeVA2 = createDummyClipVA(gl, computeProgram2)
-  // const computeVA3 = createDummyClipVA(gl, computeProgram3)
+  const computeVA3 = createDummyClipVA(gl, computeProgram3)
   // const computeVA4 = createDummyClipVA(gl, computeProgram4)
   const computeVA5 = createDummyClipVA(gl, computeProgram5)
   const drawVA = createDummyClipVA(gl, drawProgram)
@@ -164,6 +175,8 @@ onMounted(() => {
   // const srcTexLoc = gl.getUniformLocation(computeProgram, 'srcTex')
   const computeTex1 = createTexture(gl)
   const computeTex2 = createTexture(gl)
+  const computeTex3 = createTexture(gl)
+  const computeTex4 = createTexture(gl)
   const computeTex5 = createTexture(gl)
 
   // Setup destination texture
@@ -180,6 +193,8 @@ onMounted(() => {
   }
   const fb1 = createFrameBuffer(gl, computeTex1)
   const fb2 = createFrameBuffer(gl, computeTex2)
+  const fb3 = createFrameBuffer(gl, computeTex3)
+  const fb4 = createFrameBuffer(gl, computeTex4)
   const fb5 = createFrameBuffer(gl, computeTex5)
 
   //================================
@@ -205,7 +220,7 @@ onMounted(() => {
     //--------------------------------
     // Computation
     //--------------------------------
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 20; i++) {
       //--------------------------------
       // (1)
       //--------------------------------
@@ -228,14 +243,32 @@ onMounted(() => {
       // (2)
       //--------------------------------
       tex = computeTex2
-      fb = fb5
-      gl.useProgram(computeProgram5)
+      fb = fb3
+      gl.useProgram(computeProgram2)
       gl.bindVertexArray(computeVA2)
       gl.uniform1i(computeProgLocs2.computeTex, 0)
       gl.viewport(0, 0, app.value.computeWidth, app.value.computeHeight)
       gl.uniform1f(computeProgLocs2.time, time)
       gl.uniform2i(computeProgLocs2.computeSize, app.value.computeWidth, app.value.computeHeight)
       gl.uniform1f(computeProgLocs2.kappa, parameter.value.kappa)
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
+      gl.bindTexture(gl.TEXTURE_2D, tex)
+      gl.drawArrays(gl.TRIANGLES, 0, 6)
+
+      //--------------------------------
+      // (3)
+      //--------------------------------
+      tex = computeTex3
+      fb = fb5
+      gl.useProgram(computeProgram3)
+      gl.bindVertexArray(computeVA3)
+      gl.uniform1i(computeProgLocs3.computeTex, 0)
+      gl.viewport(0, 0, app.value.computeWidth, app.value.computeHeight)
+      gl.uniform1f(computeProgLocs3.time, time)
+      gl.uniform1f(computeProgLocs3.beta, parameter.value.beta)
+      gl.uniform1f(computeProgLocs3.alpha, parameter.value.alpha)
+      gl.uniform1f(computeProgLocs3.theta, parameter.value.theta)
+      gl.uniform2i(computeProgLocs3.computeSize, app.value.computeWidth, app.value.computeHeight)
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
       gl.bindTexture(gl.TEXTURE_2D, tex)
       gl.drawArrays(gl.TRIANGLES, 0, 6)

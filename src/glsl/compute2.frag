@@ -43,11 +43,15 @@ vec4 sum(sampler2D texture, ivec2 pos) {
 
 void main() {
     ivec2 pos = ivec2(gl_FragCoord.xy);
-    ivec2 center = computeSize / 2;
     vec4 current = texelFetch(computeTex, pos, 0);  // 0 = mip level 0
     vec4 next = current;
-    next.y = current.y + (1.f - kappa) * current.w;
-    next.z = current.z + kappa * current.w;
-    next.w = 0.f;
+    if(current.x < 0.5f) {
+        int na = countA(computeTex, pos);
+        if(na > 0) {
+            next.y = current.y + (1.f - kappa) * current.w;
+            next.z = current.z + kappa * current.w;
+            next.w = 0.f;
+        }
+    }
     outColor = next;
 }

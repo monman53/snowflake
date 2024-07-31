@@ -4,8 +4,9 @@ precision highp float;
 uniform sampler2D computeTex;
 
 uniform float time;
-uniform float rho;
-uniform bool reset;
+uniform float beta;
+uniform float alpha;
+uniform float theta;
 uniform ivec2 computeSize;
 
 out vec4 outColor;
@@ -44,30 +45,35 @@ vec4 sum(sampler2D texture, ivec2 pos) {
 
 void main() {
     ivec2 pos = ivec2(gl_FragCoord.xy);
-    ivec2 center = computeSize / 2;
     vec4 current = texelFetch(computeTex, pos, 0);  // 0 = mip level 0
     vec4 next = current;
-    if(reset) {
-        if(pos == center) {
-            next = vec4(1, 0, 1, 0);
-        } else {
-            next = vec4(0, 0, 0, rho);
-        }
-    } else {
+    if(current.x < 0.5f) {
         int na = countA(computeTex, pos);
-        // vec4 sum = sum(computeTex, pos);
-        if(current.x < 0.5f) {
-            float d = 0.f;
-            for(int i = 0; i < 7; i++) {
-                vec4 value = getValue(computeTex, pos + nei[i]);
-                if(value.x > 0.5f) {
-                    d += current.w;
-                } else {
-                    d += value.w;
-                }
+        if(na == 1 || na == 2) {
+            if(current.y >= beta) {
+                next.x = 1.0f;
             }
-            next.w = d / 7.0f;
+        }
+        if(na >= 3) {
+            if(current.y >= 1.f) {
+                next.x = 1.0f;
+            }
+            vec4 s = sum(computeTex, pos);
+            if(s.w < theta && current.y >= alpha) {
+                next.x = 1.0f;
+            }
+        }
+        if(na >= 4) {
+            next.x = 1.0f;
+        }
+
+        if(next.x > 0.5f) {
+            next.z = current.y + current.z;
+            next.y = 0.0f;
         }
     }
+    // next.y = current.y + (1.f - kappa) * current.w;
+    // next.z = current.z + kappa * current.w;
+    // next.w = 0.f;
     outColor = next;
 }
