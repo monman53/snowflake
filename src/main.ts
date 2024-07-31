@@ -16,6 +16,7 @@ export const app = ref({
 export const fps = ref(0)
 
 export const parameter = ref({
+  lightAngle: 0,
   rot: 0,
   rho: 1.0,
   beta: 2.2,
@@ -35,10 +36,17 @@ export const parameterProps = ref([
     props: [
       {
         name: 'rot',
-        default: 1,
+        default: 1 / 12,
         min: 0,
         max: 1,
-        step: 0.001
+        step: 0.0001
+      },
+      {
+        name: 'lightAngle',
+        default: 0,
+        min: 0,
+        max: 1,
+        step: 0.0001
       },
       {
         name: 'rho',

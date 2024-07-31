@@ -5,7 +5,7 @@ uniform sampler2D computeTex;
 
 uniform float time;
 uniform float sigma;
-uniform vec2 computeSize;
+uniform ivec2 computeSize;
 
 out vec4 outColor;
 
@@ -49,6 +49,11 @@ void main() {
         next.w = (1.f + sigma) * current.w;
     } else {
         next.w = (1.f - sigma) * current.w;
+    }
+    // if(abs(texelCoord.x + texelCoord.y) > computeSize.x / 2) {
+    if(texelCoord.x > 400) {
+        // next.x = 1.f;
+        outColor = next;
     }
     outColor = next;
 }

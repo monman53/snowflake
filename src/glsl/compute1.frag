@@ -34,14 +34,6 @@ int countA(sampler2D texture, ivec2 pos) {
     return count;
 }
 
-vec4 sum(sampler2D texture, ivec2 pos) {
-    vec4 sum = vec4(0.f);
-    for(int i = 0; i < 7; i++) {
-        sum += getValue(texture, pos + nei[i]);
-    }
-    return sum;
-}
-
 void main() {
     ivec2 pos = ivec2(gl_FragCoord.xy);
     ivec2 center = computeSize / 2;

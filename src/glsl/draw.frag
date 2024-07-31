@@ -7,6 +7,7 @@ uniform sampler2D computeTex;
 uniform vec2 canvasSize;
 uniform vec2 computeSize;
 uniform float rot;
+uniform float lightAngle;
 
 out vec4 outColor;
 
@@ -14,8 +15,9 @@ out vec4 outColor;
 
 vec4 getValue(vec2 fragCoord) {
     vec2 fragPos = fragCoord - canvasSize * 0.5f;
-    float co = cos(rot * M_PI / 6.f);
-    float si = sin(rot * M_PI / 6.f);
+    float angle = rot * M_PI * 2.f;
+    float co = cos(angle);
+    float si = sin(angle);
     mat2 rot = mat2(co, -si, si, co);
     fragPos = rot * fragPos;
     fragPos.y *= 2.0f / sqrt(3.0f);
@@ -32,11 +34,19 @@ void main() {
     vec4 gradX, gradY;
     // x
     {
-        gradX = getValue(vec2(pos.x + 1.0f, pos.y)) - getValue(vec2(pos.x - 1.0f, pos.y));
+        vec4 v1 = getValue(vec2(pos.x - 2.0f, pos.y));
+        vec4 v2 = getValue(vec2(pos.x - 1.0f, pos.y));
+        vec4 v3 = getValue(vec2(pos.x + 1.0f, pos.y));
+        vec4 v4 = getValue(vec2(pos.x + 2.0f, pos.y));
+        gradX = -0.2f * v1 - v2 + v3 + 0.2f * v4;
     }
     // t
     {
-        gradY = getValue(vec2(pos.x, pos.y + 1.0f)) - getValue(vec2(pos.x, pos.y - 1.0f));
+        vec4 v1 = getValue(vec2(pos.x, pos.y - 2.0f));
+        vec4 v2 = getValue(vec2(pos.x, pos.y - 1.0f));
+        vec4 v3 = getValue(vec2(pos.x, pos.y + 1.0f));
+        vec4 v4 = getValue(vec2(pos.x, pos.y + 2.0f));
+        gradY = -0.2f * v1 - v2 + v3 + 0.2f * v4;
     }
     vec2 gradC = vec2(gradX.z, gradY.z);
 
@@ -45,14 +55,10 @@ void main() {
     float d = value.w;
     vec3 background = vec3(0.4f, 0.5f, 0.7f);
     if(a > 0.5f) {
-        float color = -dot(gradC, vec2(1, 0));
-        // outColor = vec4(vec3(color), 1.f);
+        float angle = lightAngle * 2.f * M_PI;
+        float color = -dot(gradC, vec2(cos(angle), sin(angle)));
         outColor = vec4(background + vec3(color), 1.f);
     } else {
-        // outColor = vec4(0.5f + vec3(d), 1.f);
-        // outColor = vec4(vec3(-d), 1.f);
-        // outColor = vec4(vec3(0), 1.f);
-        outColor = vec4(background, 1.f);
-        // outColor = vec4(1.f);
+        outColor = vec4(vec3(background), 1.f);
     }
 }
