@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
 import { app, fps, parameter, parameterProps } from './main'
-import { humanReadable, resetParameter } from './utils'
+import { humanReadable, resetAllParameter, resetParameter } from './utils'
 import { parameterTemplates } from './templates'
 
 type ModeType = 'control' | 'info' | ''
@@ -37,11 +37,32 @@ const setParameter = (t: any) => {
 
     <div class="content">
       <div v-if="mode === 'control'" id="controller">
+        <fieldset>
+          <legend>Animation</legend>
+          <span id="animation">
+            <i class="bi bi-skip-start-fill pointer" @click="app.reset = true"></i>
+            <i v-if="!app.pause" class="bi bi-pause-fill pointer" @click="app.pause = true"></i>
+            <i v-if="app.pause" class="bi bi-play-fill pointer" @click="app.pause = false"></i>
+          </span>
+          <br />
+          FPS: {{ humanReadable(fps) }}, Iteration: {{ app.iteration }}<br />
+          <label>
+            Iteration per frame
+            <input style="width: 4em" type="number" min="0" v-model.number="app.iterPerFrame" />
+          </label>
+        </fieldset>
         <template v-for="category of parameterProps" :key="category.name">
           <fieldset>
-            <legend class="pointer" @click="category.visible = !category.visible">
-              <i class="bi bi-dash" v-if="category.visible"></i
-              ><i class="bi bi-plus" v-if="!category.visible"></i> {{ category.name }}
+            <legend>
+              <span class="pointer" @click="category.visible = !category.visible">
+                <i class="bi bi-caret-down-fill" v-if="category.visible"></i>
+                <i class="bi bi-caret-right-fill" v-if="!category.visible"></i>
+                {{ category.name }}
+              </span>
+              &nbsp;
+              <span class="pointer">
+                <i class="bi bi-arrow-clockwise" @click="resetParameter(category)"></i>
+              </span>
             </legend>
             <template v-if="category.visible">
               <template v-for="prop of category.props" :key="prop.name">
@@ -57,6 +78,10 @@ const setParameter = (t: any) => {
                     @dblclick="parameter[prop.name as keyof typeof parameter] = prop.default"
                   />
                 </label>
+                <i
+                  class="bi bi-arrow-clockwise pointer"
+                  @click="parameter[prop.name as keyof typeof parameter] = prop.default"
+                ></i>
                 <span style="float: right">
                   {{ humanReadable(parameter[prop.name as keyof typeof parameter]) }}
                 </span>
@@ -69,15 +94,8 @@ const setParameter = (t: any) => {
           <legend>Templates</legend>
           <template v-for="(t, idx) of parameterTemplates" :key="idx">
             <button @click="setParameter(t)">{{ t.name }}</button>
+            <br v-if="idx % 8 == 7" />
           </template>
-          <br />
-          <button @click="app.reset = true">Clear</button>
-          <button @click="resetParameter">Reset all parameter</button><br />
-        </fieldset>
-        <fieldset>
-          <legend>Info</legend>
-          FPS: {{ humanReadable(fps) }}<br />
-          Iteration: {{ app.iteration }}<br />
         </fieldset>
       </div>
       <div v-if="mode === 'info'">
@@ -101,11 +119,15 @@ const setParameter = (t: any) => {
 
   margin: 1em;
   padding: 0.5em;
-  max-width: 20em;
+  max-width: 30em;
   border-radius: 1em;
   color: white;
   background-color: #0008;
   backdrop-filter: blur(4px);
+}
+
+fieldset {
+  margin-bottom: 1em;
 }
 
 #controller {
@@ -130,6 +152,10 @@ a {
   text-decoration: none;
 }
 
+#animation {
+  font-size: 2em;
+}
+
 .mode-select {
   margin: 0.3em;
   font-size: 1.5em;
@@ -140,6 +166,11 @@ a {
 
 .pointer {
   cursor: pointer;
+}
+
+p {
+  margin-left: 0.5em;
+  margin-right: 0.5em;
 }
 
 .footer {

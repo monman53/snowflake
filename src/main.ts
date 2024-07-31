@@ -2,14 +2,16 @@ import './assets/main.css'
 
 import { createApp, ref } from 'vue'
 import App from './App.vue'
-import { resetParameter } from './utils'
+import { resetAllParameter } from './utils'
 
 export const app = ref({
   width: window.innerWidth,
   height: window.innerHeight,
   computeSize: 1 << 10,
   reset: true,
+  pause: false,
   iteration: 0,
+  iterPerFrame: 32,
   fps: 0
 })
 
@@ -37,13 +39,6 @@ export const parameterProps = ref([
     name: 'Parameters',
     visible: true,
     props: [
-      {
-        name: 'rot',
-        default: 1 / 12,
-        min: 0,
-        max: 1,
-        step: 0.0001
-      },
       {
         name: 'rho',
         default: 0.46,
@@ -103,7 +98,7 @@ export const parameterProps = ref([
     ]
   },
   {
-    name: 'Color',
+    name: 'Display',
     visible: false,
     props: [
       {
@@ -128,6 +123,13 @@ export const parameterProps = ref([
         step: 0.0001
       },
       {
+        name: 'rot',
+        default: 1 / 12,
+        min: 0,
+        max: 1,
+        step: 0.0001
+      },
+      {
         name: 'lightAngle',
         default: 0,
         min: 0,
@@ -145,7 +147,7 @@ export const parameterProps = ref([
   }
 ])
 
-resetParameter()
+resetAllParameter()
 
 const resize = () => {
   app.value.width = window.innerWidth

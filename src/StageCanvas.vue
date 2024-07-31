@@ -237,7 +237,7 @@ onMounted(() => {
     //--------------------------------
     // Computation
     //--------------------------------
-    const numItr = 32
+    const numItr = app.value.pause ? (app.value.reset ? 1 : 0) : app.value.iterPerFrame
     for (let i = 0; i < numItr; i++) {
       //--------------------------------
       // (1)
