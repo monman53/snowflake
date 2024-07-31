@@ -110,6 +110,7 @@ export const parameterTemplates = [
     sigma: 0
   },
   {
+    // Simple star
     name: '13l',
     rho: 0.65,
     beta: 1.75,
@@ -117,7 +118,7 @@ export const parameterTemplates = [
     theta: 0.026,
     kappa: 0.15,
     mu: 0.015,
-    gamma: 0.0001,
+    gamma: 0.00001,
     sigma: 0
   },
   {
