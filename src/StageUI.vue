@@ -8,7 +8,12 @@ import { parameter, parameterProps } from './parameters'
 type ModeType = 'control' | 'info' | ''
 const mode: Ref<ModeType> = ref('')
 
+const setAndReset = ref(true)
+
 const setParameter = (t: any) => {
+  if (setAndReset.value) {
+    app.value.reset = true
+  }
   parameter.value.rho = t.rho
   parameter.value.beta = t.beta
   parameter.value.alpha = t.alpha
@@ -97,6 +102,11 @@ const setParameter = (t: any) => {
             <button @click="setParameter(t)">{{ t.name }}</button>
             <br v-if="idx % 8 == 7" />
           </template>
+          <br />
+          <label>
+            <input type="checkbox" v-model="setAndReset" />
+            Also reset
+          </label>
         </fieldset>
       </div>
       <div v-if="mode === 'info'">
