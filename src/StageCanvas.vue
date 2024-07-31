@@ -2,7 +2,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { app, fps, parameter } from './main'
+import { app, fps } from './main'
 
 // Shaders
 import computeVS from './glsl/compute.vert?raw'
@@ -13,6 +13,7 @@ import computeFS4 from './glsl/compute4.frag?raw'
 import computeFS5 from './glsl/compute5.frag?raw'
 import drawVS from './glsl/draw.vert?raw'
 import drawFS from './glsl/draw.frag?raw'
+import { parameter } from './parameters'
 
 //--------------------------------
 // WebGL support functions
@@ -238,6 +239,7 @@ onMounted(() => {
     // Computation
     //--------------------------------
     const numItr = app.value.pause ? (app.value.reset ? 1 : 0) : app.value.iterPerFrame
+    gl.viewport(0, 0, app.value.computeSize, app.value.computeSize)
     for (let i = 0; i < numItr; i++) {
       //--------------------------------
       // (1)
@@ -247,7 +249,6 @@ onMounted(() => {
       gl.useProgram(computeProgram1)
       gl.bindVertexArray(computeVA1)
       gl.uniform1i(computeProgLocs1.computeTex, 0)
-      gl.viewport(0, 0, app.value.computeSize, app.value.computeSize)
       gl.uniform1f(computeProgLocs1.time, time)
       gl.uniform1i(computeProgLocs1.computeSize, app.value.computeSize)
       gl.uniform1i(computeProgLocs1.reset, app.value.reset ? 1 : 0)
@@ -268,7 +269,6 @@ onMounted(() => {
       gl.useProgram(computeProgram2)
       gl.bindVertexArray(computeVA2)
       gl.uniform1i(computeProgLocs2.computeTex, 0)
-      gl.viewport(0, 0, app.value.computeSize, app.value.computeSize)
       gl.uniform1f(computeProgLocs2.time, time)
       gl.uniform1i(computeProgLocs2.computeSize, app.value.computeSize)
       gl.uniform1f(computeProgLocs2.kappa, parameter.value.kappa)
@@ -284,7 +284,6 @@ onMounted(() => {
       gl.useProgram(computeProgram3)
       gl.bindVertexArray(computeVA3)
       gl.uniform1i(computeProgLocs3.computeTex, 0)
-      gl.viewport(0, 0, app.value.computeSize, app.value.computeSize)
       gl.uniform1f(computeProgLocs3.time, time)
       gl.uniform1f(computeProgLocs3.beta, parameter.value.beta)
       gl.uniform1f(computeProgLocs3.alpha, parameter.value.alpha)
@@ -302,7 +301,6 @@ onMounted(() => {
       gl.useProgram(computeProgram4)
       gl.bindVertexArray(computeVA4)
       gl.uniform1i(computeProgLocs4.computeTex, 0)
-      gl.viewport(0, 0, app.value.computeSize, app.value.computeSize)
       gl.uniform1f(computeProgLocs4.time, time)
       gl.uniform1f(computeProgLocs4.mu, parameter.value.mu)
       gl.uniform1f(computeProgLocs4.gamma, parameter.value.gamma)
@@ -319,7 +317,6 @@ onMounted(() => {
       gl.useProgram(computeProgram5)
       gl.bindVertexArray(computeVA5)
       gl.uniform1i(computeProgLocs5.computeTex, 0)
-      gl.viewport(0, 0, app.value.computeSize, app.value.computeSize)
       gl.uniform1f(computeProgLocs5.time, time)
       gl.uniform1i(computeProgLocs5.computeSize, app.value.computeSize)
       gl.uniform1f(computeProgLocs5.sigma, parameter.value.sigma)

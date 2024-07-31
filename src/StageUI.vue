@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
-import { app, fps, parameter, parameterProps } from './main'
+import { app, fps } from './main'
 import { humanReadable, resetAllParameter, resetParameter } from './utils'
 import { parameterTemplates } from './templates'
+import { parameter, parameterProps } from './parameters'
 
 type ModeType = 'control' | 'info' | ''
 const mode: Ref<ModeType> = ref('')

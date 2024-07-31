@@ -1,4 +1,4 @@
-import { parameter, parameterProps } from './main'
+import { parameter, parameterProps } from './parameters'
 
 export const humanReadable = (x: number) => {
   return x.toPrecision(4)
