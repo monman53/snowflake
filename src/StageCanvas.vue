@@ -9,6 +9,7 @@ import computeVS from './glsl/compute.vert?raw'
 import computeFS1 from './glsl/compute1.frag?raw'
 import computeFS2 from './glsl/compute2.frag?raw'
 import computeFS3 from './glsl/compute3.frag?raw'
+import computeFS4 from './glsl/compute4.frag?raw'
 import computeFS5 from './glsl/compute5.frag?raw'
 import drawVS from './glsl/draw.vert?raw'
 import drawFS from './glsl/draw.frag?raw'
@@ -92,6 +93,15 @@ onMounted(() => {
     theta: gl.getUniformLocation(computeProgram3, 'theta')
   }
 
+  const computeProgram4 = createProgram(gl, [computeVS, computeFS4])
+  const computeProgLocs4 = {
+    time: gl.getUniformLocation(computeProgram4, 'time'),
+    computeTex: gl.getUniformLocation(computeProgram4, 'computeTex'),
+    computeSize: gl.getUniformLocation(computeProgram4, 'computeSize'),
+    mu: gl.getUniformLocation(computeProgram4, 'mu'),
+    gamma: gl.getUniformLocation(computeProgram4, 'gamma')
+  }
+
   const computeProgram5 = createProgram(gl, [computeVS, computeFS5])
   const computeProgLocs5 = {
     time: gl.getUniformLocation(computeProgram5, 'time'),
@@ -141,7 +151,7 @@ onMounted(() => {
   const computeVA1 = createDummyClipVA(gl, computeProgram1)
   const computeVA2 = createDummyClipVA(gl, computeProgram2)
   const computeVA3 = createDummyClipVA(gl, computeProgram3)
-  // const computeVA4 = createDummyClipVA(gl, computeProgram4)
+  const computeVA4 = createDummyClipVA(gl, computeProgram4)
   const computeVA5 = createDummyClipVA(gl, computeProgram5)
   const drawVA = createDummyClipVA(gl, drawProgram)
 
@@ -220,7 +230,7 @@ onMounted(() => {
     //--------------------------------
     // Computation
     //--------------------------------
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 32; i++) {
       //--------------------------------
       // (1)
       //--------------------------------
@@ -259,7 +269,7 @@ onMounted(() => {
       // (3)
       //--------------------------------
       tex = computeTex3
-      fb = fb5
+      fb = fb4
       gl.useProgram(computeProgram3)
       gl.bindVertexArray(computeVA3)
       gl.uniform1i(computeProgLocs3.computeTex, 0)
@@ -269,6 +279,23 @@ onMounted(() => {
       gl.uniform1f(computeProgLocs3.alpha, parameter.value.alpha)
       gl.uniform1f(computeProgLocs3.theta, parameter.value.theta)
       gl.uniform2i(computeProgLocs3.computeSize, app.value.computeWidth, app.value.computeHeight)
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
+      gl.bindTexture(gl.TEXTURE_2D, tex)
+      gl.drawArrays(gl.TRIANGLES, 0, 6)
+
+      //--------------------------------
+      // (4)
+      //--------------------------------
+      tex = computeTex4
+      fb = fb5
+      gl.useProgram(computeProgram4)
+      gl.bindVertexArray(computeVA4)
+      gl.uniform1i(computeProgLocs4.computeTex, 0)
+      gl.viewport(0, 0, app.value.computeWidth, app.value.computeHeight)
+      gl.uniform1f(computeProgLocs4.time, time)
+      gl.uniform1f(computeProgLocs4.mu, parameter.value.mu)
+      gl.uniform1f(computeProgLocs4.gamma, parameter.value.gamma)
+      gl.uniform2i(computeProgLocs4.computeSize, app.value.computeWidth, app.value.computeHeight)
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
       gl.bindTexture(gl.TEXTURE_2D, tex)
       gl.drawArrays(gl.TRIANGLES, 0, 6)

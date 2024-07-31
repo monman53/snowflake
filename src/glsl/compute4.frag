@@ -4,9 +4,8 @@ precision highp float;
 uniform sampler2D computeTex;
 
 uniform float time;
-uniform float beta;
-uniform float alpha;
-uniform float theta;
+uniform float mu;
+uniform float gamma;
 uniform ivec2 computeSize;
 
 out vec4 outColor;
@@ -50,29 +49,13 @@ void main() {
     if(current.x < 0.5f) {
         int na = countA(computeTex, pos);
         if(na > 0) {
-            if(na == 1 || na == 2) {
-                if(current.y >= beta) {
-                    next.x = 1.0f;
-                }
-            }
-            if(na >= 3) {
-                if(current.y >= 1.f) {
-                    next.x = 1.0f;
-                }
-                vec4 s = sum(computeTex, pos);
-                if(s.w < theta && current.y >= alpha) {
-                    next.x = 1.0f;
-                }
-            }
-            if(na >= 4) {
-                next.x = 1.0f;
-            }
-
-            if(next.x > 0.5f) {
-                next.z = current.y + current.z;
-                next.y = 0.0f;
-            }
+            next.y = (1.f - mu) * current.y;
+            next.z = (1.f - gamma) * current.z;
+            next.w = current.w + mu * current.y + gamma * current.z;
         }
     }
+    // next.y = current.y + (1.f - kappa) * current.w;
+    // next.z = current.z + kappa * current.w;
+    // next.w = 0.f;
     outColor = next;
 }
