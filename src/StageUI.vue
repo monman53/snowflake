@@ -1,10 +1,21 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
-import { app, fps, parameter, parameterProps } from './main'
+import { app, fps, parameter, parameterProps, parameterTemplates } from './main'
 import { humanReadable, randomParameter, resetParameter } from './utils'
 
 type ModeType = 'control' | 'info' | ''
 const mode: Ref<ModeType> = ref('')
+
+const setParameter = (t: any) => {
+  parameter.value.rho = t.rho
+  parameter.value.beta = t.beta
+  parameter.value.alpha = t.alpha
+  parameter.value.theta = t.theta
+  parameter.value.kappa = t.kappa
+  parameter.value.mu = t.mu
+  parameter.value.gamma = t.gamma
+  parameter.value.sigma = t.sigma
+}
 </script>
 
 <template>
@@ -55,9 +66,12 @@ const mode: Ref<ModeType> = ref('')
         </template>
         <fieldset>
           <legend>Templates</legend>
-          <button @click="app.reset = true">Clear</button><br />
-          <button @click="resetParameter">Reset parameter</button><br />
-          <!-- <button @click="randomParameter">random</button><br /> -->
+          <template v-for="(t, idx) of parameterTemplates" :key="idx">
+            <button @click="setParameter(t)">{{ t.name }}</button>
+          </template>
+          <br />
+          <button @click="app.reset = true">Clear</button>
+          <button @click="resetParameter">Reset all parameter</button><br />
         </fieldset>
         <fieldset>
           <legend>Info</legend>
