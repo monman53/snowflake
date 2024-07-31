@@ -7,7 +7,7 @@ import { resetParameter } from './utils'
 export const app = ref({
   width: window.innerWidth,
   height: window.innerHeight,
-  computeSize: 1 << 9,
+  computeSize: 1 << 10,
   reset: true,
   iteration: 0,
   fps: 0
@@ -115,14 +115,14 @@ export const parameterProps = ref([
       },
       {
         name: 'saturation',
-        default: 0.4,
+        default: 0.7,
         min: 0,
         max: 1,
         step: 0.0001
       },
       {
         name: 'lightness',
-        default: 0.6,
+        default: 0.7,
         min: 0,
         max: 1,
         step: 0.0001

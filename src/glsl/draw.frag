@@ -105,8 +105,8 @@ void main() {
     if(a > 0.5f) {
         float angle = lightAngle * 2.f * M_PI;
         vec2 lightVec = lightIntensity * vec2(cos(angle), sin(angle));
-        float color = -dot(gradC, lightVec);
-        outColor = vec4(background + vec3(color), alpha);
+        float shadow = dot(gradC, lightVec);
+        outColor = vec4(background + vec3(-shadow), alpha);
         // outColor = vec4(vec3(c), alpha);
     } else {
         outColor = vec4(vec3(background), alpha);
