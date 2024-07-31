@@ -6,17 +6,17 @@ uniform sampler2D computeTex;
 uniform float time;
 uniform float rho;
 uniform bool reset;
-uniform ivec2 computeSize;
+uniform int computeSize;
 
 out vec4 outColor;
 
 bool outOfRange(ivec2 pos) {
-    ivec2 center = computeSize / 2;
+    ivec2 center = ivec2(computeSize / 2);
     ivec2 posCenter = pos - center;
-    if(abs(posCenter.x + posCenter.y) >= computeSize.x / 2) {
+    if(abs(posCenter.x + posCenter.y) > computeSize / 2) {
         return true;
     }
-    return pos.x < 0 || pos.x >= computeSize.x || pos.y < 0 || pos.y >= computeSize.y;
+    return pos.x < 0 || pos.x >= computeSize || pos.y < 0 || pos.y >= computeSize;
 }
 
 vec4 getValue(sampler2D texture, ivec2 pos) {
@@ -37,14 +37,10 @@ int countA(sampler2D texture, ivec2 pos) {
 
 void main() {
     ivec2 pos = ivec2(gl_FragCoord.xy);
-    ivec2 center = computeSize / 2;
+    ivec2 center = ivec2(computeSize / 2);
     ivec2 posCenter = pos - center;
-    vec4 current = texelFetch(computeTex, pos, 0);  // 0 = mip level 0
+    vec4 current = texelFetch(computeTex, pos, 0);
     vec4 next = current;
-    if(abs(posCenter.x + posCenter.y) >= computeSize.x / 2) {
-        outColor = next;
-        return;
-    }
     if(reset) {
         if(pos == center) {
             next = vec4(1, 0, 1, 0);
@@ -52,6 +48,10 @@ void main() {
             next = vec4(0, 0, 0, rho);
         }
     } else {
+        if(abs(posCenter.x + posCenter.y) > computeSize / 2) {
+            outColor = next;
+            return;
+        }
         int na = countA(computeTex, pos);
         // vec4 sum = sum(computeTex, pos);
         if(current.x < 0.5f) {

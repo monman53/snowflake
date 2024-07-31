@@ -7,8 +7,7 @@ import { resetParameter } from './utils'
 export const app = ref({
   width: window.innerWidth,
   height: window.innerHeight,
-  computeWidth: 1 << 10,
-  computeHeight: 1 << 10,
+  computeSize: 1 << 9,
   reset: true,
   iteration: 0,
   fps: 0

@@ -5,7 +5,7 @@ uniform sampler2D computeTex;
 
 uniform float time;
 uniform float kappa;
-uniform ivec2 computeSize;
+uniform int computeSize;
 
 out vec4 outColor;
 
@@ -27,11 +27,11 @@ int countA(sampler2D texture, ivec2 pos) {
 
 void main() {
     ivec2 pos = ivec2(gl_FragCoord.xy);
-    ivec2 center = computeSize / 2;
+    ivec2 center = ivec2(computeSize / 2);
     ivec2 posCenter = pos - center;
-    vec4 current = texelFetch(computeTex, pos, 0);  // 0 = mip level 0
+    vec4 current = texelFetch(computeTex, pos, 0);
     vec4 next = current;
-    if(abs(posCenter.x + posCenter.y) >= computeSize.x / 2) {
+    if(abs(posCenter.x + posCenter.y) > computeSize / 2) {
         outColor = next;
         return;
     }

@@ -5,7 +5,7 @@ precision highp float;
 uniform sampler2D computeTex;
 
 uniform vec2 canvasSize;
-uniform vec2 computeSize;
+uniform int computeSize;
 uniform float rot;
 uniform float lightAngle;
 uniform float lightIntensity;
@@ -69,7 +69,7 @@ vec4 getValue(vec2 fragCoord) {
     fragPos = rot * fragPos;
     fragPos.y *= 2.0f / sqrt(3.0f);
     fragPos.x -= fragPos.y * 0.5f;
-    vec2 pos = vec2(fragPos + computeSize / 2.f);
+    vec2 pos = vec2(fragPos + float(computeSize) / 2.f);
     ivec2 ipos = ivec2(pos);
     vec4 value = texelFetch(computeTex, ipos, 0);
     return value;
@@ -107,7 +107,9 @@ void main() {
         vec2 lightVec = lightIntensity * vec2(cos(angle), sin(angle));
         float color = -dot(gradC, lightVec);
         outColor = vec4(background + vec3(color), alpha);
+        // outColor = vec4(vec3(c), alpha);
     } else {
         outColor = vec4(vec3(background), alpha);
+        // outColor = vec4(vec3(d), alpha);
     }
 }

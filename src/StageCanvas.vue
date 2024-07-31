@@ -175,8 +175,8 @@ onMounted(() => {
       gl.TEXTURE_2D,
       0, // mip level
       gl.RGBA32F, // internal format
-      app.value.computeWidth,
-      app.value.computeHeight,
+      app.value.computeSize,
+      app.value.computeSize,
       0, // border
       gl.RGBA, // format
       gl.FLOAT, // type
@@ -247,9 +247,9 @@ onMounted(() => {
       gl.useProgram(computeProgram1)
       gl.bindVertexArray(computeVA1)
       gl.uniform1i(computeProgLocs1.computeTex, 0)
-      gl.viewport(0, 0, app.value.computeWidth, app.value.computeHeight)
+      gl.viewport(0, 0, app.value.computeSize, app.value.computeSize)
       gl.uniform1f(computeProgLocs1.time, time)
-      gl.uniform2i(computeProgLocs1.computeSize, app.value.computeWidth, app.value.computeHeight)
+      gl.uniform1i(computeProgLocs1.computeSize, app.value.computeSize)
       gl.uniform1i(computeProgLocs1.reset, app.value.reset ? 1 : 0)
       gl.uniform1f(computeProgLocs1.rho, parameter.value.rho)
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
@@ -268,9 +268,9 @@ onMounted(() => {
       gl.useProgram(computeProgram2)
       gl.bindVertexArray(computeVA2)
       gl.uniform1i(computeProgLocs2.computeTex, 0)
-      gl.viewport(0, 0, app.value.computeWidth, app.value.computeHeight)
+      gl.viewport(0, 0, app.value.computeSize, app.value.computeSize)
       gl.uniform1f(computeProgLocs2.time, time)
-      gl.uniform2i(computeProgLocs2.computeSize, app.value.computeWidth, app.value.computeHeight)
+      gl.uniform1i(computeProgLocs2.computeSize, app.value.computeSize)
       gl.uniform1f(computeProgLocs2.kappa, parameter.value.kappa)
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
       gl.bindTexture(gl.TEXTURE_2D, tex)
@@ -284,12 +284,12 @@ onMounted(() => {
       gl.useProgram(computeProgram3)
       gl.bindVertexArray(computeVA3)
       gl.uniform1i(computeProgLocs3.computeTex, 0)
-      gl.viewport(0, 0, app.value.computeWidth, app.value.computeHeight)
+      gl.viewport(0, 0, app.value.computeSize, app.value.computeSize)
       gl.uniform1f(computeProgLocs3.time, time)
       gl.uniform1f(computeProgLocs3.beta, parameter.value.beta)
       gl.uniform1f(computeProgLocs3.alpha, parameter.value.alpha)
       gl.uniform1f(computeProgLocs3.theta, parameter.value.theta)
-      gl.uniform2i(computeProgLocs3.computeSize, app.value.computeWidth, app.value.computeHeight)
+      gl.uniform1i(computeProgLocs3.computeSize, app.value.computeSize)
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
       gl.bindTexture(gl.TEXTURE_2D, tex)
       gl.drawArrays(gl.TRIANGLES, 0, 6)
@@ -302,11 +302,11 @@ onMounted(() => {
       gl.useProgram(computeProgram4)
       gl.bindVertexArray(computeVA4)
       gl.uniform1i(computeProgLocs4.computeTex, 0)
-      gl.viewport(0, 0, app.value.computeWidth, app.value.computeHeight)
+      gl.viewport(0, 0, app.value.computeSize, app.value.computeSize)
       gl.uniform1f(computeProgLocs4.time, time)
       gl.uniform1f(computeProgLocs4.mu, parameter.value.mu)
       gl.uniform1f(computeProgLocs4.gamma, parameter.value.gamma)
-      gl.uniform2i(computeProgLocs4.computeSize, app.value.computeWidth, app.value.computeHeight)
+      gl.uniform1i(computeProgLocs4.computeSize, app.value.computeSize)
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
       gl.bindTexture(gl.TEXTURE_2D, tex)
       gl.drawArrays(gl.TRIANGLES, 0, 6)
@@ -319,9 +319,9 @@ onMounted(() => {
       gl.useProgram(computeProgram5)
       gl.bindVertexArray(computeVA5)
       gl.uniform1i(computeProgLocs5.computeTex, 0)
-      gl.viewport(0, 0, app.value.computeWidth, app.value.computeHeight)
+      gl.viewport(0, 0, app.value.computeSize, app.value.computeSize)
       gl.uniform1f(computeProgLocs5.time, time)
-      gl.uniform2i(computeProgLocs5.computeSize, app.value.computeWidth, app.value.computeHeight)
+      gl.uniform1i(computeProgLocs5.computeSize, app.value.computeSize)
       gl.uniform1f(computeProgLocs5.sigma, parameter.value.sigma)
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
       gl.bindTexture(gl.TEXTURE_2D, tex)
@@ -347,7 +347,7 @@ onMounted(() => {
     gl.uniform1f(drawProgLocs.saturation, parameter.value.saturation)
     gl.uniform1f(drawProgLocs.lightness, parameter.value.lightness)
     gl.uniform2f(drawProgLocs.canvasSize, app.value.width, app.value.height)
-    gl.uniform2f(drawProgLocs.computeSize, app.value.computeWidth, app.value.computeHeight)
+    gl.uniform1i(drawProgLocs.computeSize, app.value.computeSize)
 
     gl.bindVertexArray(drawVA)
     gl.viewport(0, 0, app.value.width, app.value.height)
