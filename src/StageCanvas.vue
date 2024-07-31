@@ -248,9 +248,9 @@ onMounted(() => {
     //--------------------------------
     // Computation
     //--------------------------------
+    gl.viewport(0, 0, textureSize.value, textureSize.value)
 
     // Initialize field
-    gl.viewport(0, 0, textureSize.value, textureSize.value)
     if (app.value.reset) {
       let fb = fb1
       gl.useProgram(computeProgram0)
@@ -268,6 +268,11 @@ onMounted(() => {
     // Inner frame iteration
     const numItr = app.value.pause ? 0 : app.value.iterPerFrame
     for (let i = 0; i < numItr; i++) {
+      if (app.value.useMaxIter && app.value.iteration >= app.value.maxIter) {
+        app.value.pause = true
+        break
+      }
+
       //--------------------------------
       // (1)
       //--------------------------------
@@ -344,8 +349,9 @@ onMounted(() => {
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
       gl.bindTexture(gl.TEXTURE_2D, tex)
       gl.drawArrays(gl.TRIANGLES, 0, 6)
+
+      app.value.iteration += 1
     }
-    app.value.iteration += numItr
 
     //--------------------------------
     // Draw

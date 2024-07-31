@@ -56,6 +56,12 @@ const setParameter = (t: any) => {
             Iteration per frame
             <input style="width: 4em" type="number" min="0" v-model.number="app.iterPerFrame" />
           </label>
+          <br />
+          <label>
+            <input type="checkbox" v-model="app.useMaxIter" />
+            Set max iterations
+          </label>
+          <input type="number" v-model.number="app.maxIter" style="width: 4em" />
         </fieldset>
         <template v-for="category of parameterProps" :key="category.name">
           <fieldset>
