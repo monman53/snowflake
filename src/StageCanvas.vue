@@ -106,7 +106,8 @@ onMounted(() => {
   const computeProgLocs5 = {
     time: gl.getUniformLocation(computeProgram5, 'time'),
     computeTex: gl.getUniformLocation(computeProgram5, 'computeTex'),
-    computeSize: gl.getUniformLocation(computeProgram5, 'computeSize')
+    computeSize: gl.getUniformLocation(computeProgram5, 'computeSize'),
+    sigma: gl.getUniformLocation(computeProgram5, 'sigma')
   }
 
   const drawProgram = createProgram(gl, [drawVS, drawFS])
@@ -312,6 +313,7 @@ onMounted(() => {
       gl.viewport(0, 0, app.value.computeWidth, app.value.computeHeight)
       gl.uniform1f(computeProgLocs5.time, time)
       gl.uniform2i(computeProgLocs5.computeSize, app.value.computeWidth, app.value.computeHeight)
+      gl.uniform1f(computeProgLocs5.sigma, parameter.value.sigma)
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
       gl.bindTexture(gl.TEXTURE_2D, tex)
       gl.drawArrays(gl.TRIANGLES, 0, 6)

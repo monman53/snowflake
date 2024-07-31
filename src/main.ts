@@ -51,36 +51,36 @@ export const parameterProps = ref([
         name: 'beta',
         default: 1.3,
         min: 1.0,
-        max: 5.0,
+        max: 4.0,
         step: 0.001
       },
       {
         name: 'alpha',
         default: 0.08,
         min: 0,
-        max: 1,
-        step: 0.001
+        max: 0.5,
+        step: 0.0001
       },
       {
         name: 'theta',
         default: 0.025,
         min: 0,
-        max: 1,
+        max: 0.2,
         step: 0.001
       },
       {
         name: 'kappa',
         default: 0.003,
         min: 0,
-        max: 1,
-        step: 0.001
+        max: 0.2,
+        step: 0.0001
       },
       {
         name: 'mu',
         default: 0.07,
         min: 0,
-        max: 1,
-        step: 0.001
+        max: 0.2,
+        step: 0.0001
       },
       {
         name: 'gamma',
@@ -93,8 +93,8 @@ export const parameterProps = ref([
         name: 'sigma',
         default: 0,
         min: 0,
-        max: 1,
-        step: 0.001
+        max: 0.0001,
+        step: 0.000001
       }
     ]
   },
