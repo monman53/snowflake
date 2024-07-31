@@ -293,7 +293,7 @@ export const parameterProps = ref([
       },
       {
         name: 'lightIntensity',
-        default: 1,
+        default: 1.5,
         min: 0,
         max: 10,
         step: 0.0001

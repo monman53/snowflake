@@ -81,7 +81,7 @@ const setParameter = (t: any) => {
       </div>
       <div v-if="mode === 'info'">
         <p>
-          This is an implementation of J. Gravner, D. Griffeath,
+          This is an unofficial implementation of J. Gravner, D. Griffeath,
           <i>MODELING SNOW CRYSTAL GROWTH II: A mesoscopic lattice map with plausible dynamics</i>
           Physica D: Nonlinear Phenomena, Volume 237, Issue 3, 2008, Pages 385-404
         </p>
@@ -100,7 +100,7 @@ const setParameter = (t: any) => {
 
   margin: 1em;
   padding: 0.5em;
-  max-width: 30em;
+  max-width: 20em;
   border-radius: 1em;
   color: white;
   background-color: #0008;
