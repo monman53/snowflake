@@ -6,6 +6,7 @@ import { app, fps } from './main'
 
 // Shaders
 import computeVS from './glsl/compute.vert?raw'
+import computeFS0 from './glsl/compute0.frag?raw'
 import computeFS1 from './glsl/compute1.frag?raw'
 import computeFS2 from './glsl/compute2.frag?raw'
 import computeFS3 from './glsl/compute3.frag?raw'
@@ -67,11 +68,17 @@ onMounted(() => {
   // Create programs
   //--------------------------------
 
+  const computeProgram0 = createProgram(gl, [computeVS, computeFS0])
+  const computeProgLocs0 = {
+    time: gl.getUniformLocation(computeProgram0, 'time'),
+    rho: gl.getUniformLocation(computeProgram0, 'rho'),
+    computeTex: gl.getUniformLocation(computeProgram0, 'computeTex'),
+    computeSize: gl.getUniformLocation(computeProgram0, 'computeSize')
+  }
+
   const computeProgram1 = createProgram(gl, [computeVS, computeFS1])
   const computeProgLocs1 = {
     time: gl.getUniformLocation(computeProgram1, 'time'),
-    reset: gl.getUniformLocation(computeProgram1, 'reset'),
-    rho: gl.getUniformLocation(computeProgram1, 'rho'),
     computeTex: gl.getUniformLocation(computeProgram1, 'computeTex'),
     computeSize: gl.getUniformLocation(computeProgram1, 'computeSize')
   }
@@ -156,6 +163,7 @@ onMounted(() => {
     return vao
   }
 
+  const computeVA0 = createDummyClipVA(gl, computeProgram0)
   const computeVA1 = createDummyClipVA(gl, computeProgram1)
   const computeVA2 = createDummyClipVA(gl, computeProgram2)
   const computeVA3 = createDummyClipVA(gl, computeProgram3)
@@ -238,8 +246,25 @@ onMounted(() => {
     //--------------------------------
     // Computation
     //--------------------------------
-    const numItr = app.value.pause ? (app.value.reset ? 1 : 0) : app.value.iterPerFrame
+
+    // Initialize field
     gl.viewport(0, 0, app.value.computeSize, app.value.computeSize)
+    if (app.value.reset) {
+      let fb = fb1
+      gl.useProgram(computeProgram0)
+      gl.bindVertexArray(computeVA0)
+      gl.uniform1i(computeProgLocs0.computeTex, 0)
+      gl.uniform1f(computeProgLocs0.rho, parameter.value.rho)
+      gl.uniform1i(computeProgLocs0.computeSize, app.value.computeSize)
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
+      gl.drawArrays(gl.TRIANGLES, 0, 6)
+
+      app.value.iteration = 0
+      app.value.reset = false
+    }
+
+    // Inner frame iteration
+    const numItr = app.value.pause ? 0 : app.value.iterPerFrame
     for (let i = 0; i < numItr; i++) {
       //--------------------------------
       // (1)
@@ -251,15 +276,9 @@ onMounted(() => {
       gl.uniform1i(computeProgLocs1.computeTex, 0)
       gl.uniform1f(computeProgLocs1.time, time)
       gl.uniform1i(computeProgLocs1.computeSize, app.value.computeSize)
-      gl.uniform1i(computeProgLocs1.reset, app.value.reset ? 1 : 0)
-      gl.uniform1f(computeProgLocs1.rho, parameter.value.rho)
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
       gl.bindTexture(gl.TEXTURE_2D, tex)
       gl.drawArrays(gl.TRIANGLES, 0, 6)
-      if (app.value.reset) {
-        app.value.iteration = 0
-        app.value.reset = false
-      }
 
       //--------------------------------
       // (2)

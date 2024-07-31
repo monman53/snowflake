@@ -4,8 +4,6 @@ precision highp float;
 uniform sampler2D computeTex;
 
 uniform float time;
-uniform float rho;
-uniform bool reset;
 uniform int computeSize;
 
 out vec4 outColor;
@@ -41,35 +39,25 @@ void main() {
     ivec2 posCenter = pos - center;
     vec4 current = texelFetch(computeTex, pos, 0);
     vec4 next = current;
-    if(reset) {
-        if(pos == center) {
-            next = vec4(1, 0, 1, 0);
-        } else {
-            next = vec4(0, 0, 0, rho);
-        }
-    } else {
-        if(abs(posCenter.x + posCenter.y) > computeSize / 2) {
-            outColor = next;
-            return;
-        }
-        int na = countA(computeTex, pos);
-        // vec4 sum = sum(computeTex, pos);
-        if(current.x < 0.5f) {
-            float d = 0.f;
-            for(int i = 0; i < 7; i++) {
-                ivec2 nextPos = pos + nei[i];
-                if(outOfRange(nextPos)) {
-                    nextPos = pos;
-                }
-                vec4 value = getValue(computeTex, nextPos);
-                if(value.x > 0.5f) {
-                    d += current.w;
-                } else {
-                    d += value.w;
-                }
+    if(abs(posCenter.x + posCenter.y) > computeSize / 2) {
+        outColor = next;
+        return;
+    }
+    if(current.x < 0.5f) {
+        float d = 0.f;
+        for(int i = 0; i < 7; i++) {
+            ivec2 nextPos = pos + nei[i];
+            if(outOfRange(nextPos)) {
+                nextPos = pos;
             }
-            next.w = d / 7.0f;
+            vec4 value = getValue(computeTex, nextPos);
+            if(value.x > 0.5f) {
+                d += current.w;
+            } else {
+                d += value.w;
+            }
         }
+        next.w = d / 7.0f;
     }
     outColor = next;
 }
