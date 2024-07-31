@@ -7,6 +7,8 @@ Physica D: Nonlinear Phenomena, Volume 237, Issue 3, 2008, Pages 385-404
 ## Screenshots
 
 ![screenshot](./screenshot.png)
+![screenshot](./screenshot2.png)
+![screenshot](./screenshot3.png)
 
 ## Development
 
