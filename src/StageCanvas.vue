@@ -117,6 +117,7 @@ onMounted(() => {
     computeTex: gl.getUniformLocation(drawProgram, 'computeTex'),
     rot: gl.getUniformLocation(drawProgram, 'rot'),
     lightAngle: gl.getUniformLocation(drawProgram, 'lightAngle'),
+    lightIntensity: gl.getUniformLocation(drawProgram, 'lightIntensity'),
     hue: gl.getUniformLocation(drawProgram, 'hue'),
     saturation: gl.getUniformLocation(drawProgram, 'saturation'),
     lightness: gl.getUniformLocation(drawProgram, 'lightness')
@@ -341,6 +342,7 @@ onMounted(() => {
     gl.uniform1i(drawProgLocs.computeTex, 0)
     gl.uniform1f(drawProgLocs.rot, parameter.value.rot)
     gl.uniform1f(drawProgLocs.lightAngle, parameter.value.lightAngle)
+    gl.uniform1f(drawProgLocs.lightIntensity, parameter.value.lightIntensity)
     gl.uniform1f(drawProgLocs.hue, parameter.value.hue)
     gl.uniform1f(drawProgLocs.saturation, parameter.value.saturation)
     gl.uniform1f(drawProgLocs.lightness, parameter.value.lightness)

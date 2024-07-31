@@ -18,6 +18,7 @@ export const fps = ref(0)
 
 export const parameter = ref({
   lightAngle: 0,
+  lightIntensity: 1.0,
   rot: 0,
   rho: 1.0,
   beta: 2.2,
@@ -35,7 +36,7 @@ export const parameter = ref({
 export const parameterProps = ref([
   {
     name: 'Parameters',
-    visible: false,
+    visible: true,
     props: [
       {
         name: 'rot',
@@ -107,13 +108,6 @@ export const parameterProps = ref([
     visible: false,
     props: [
       {
-        name: 'lightAngle',
-        default: 0,
-        min: 0,
-        max: 1,
-        step: 0.0001
-      },
-      {
         name: 'hue',
         default: 0.6,
         min: 0,
@@ -132,6 +126,20 @@ export const parameterProps = ref([
         default: 0.6,
         min: 0,
         max: 1,
+        step: 0.0001
+      },
+      {
+        name: 'lightAngle',
+        default: 0,
+        min: 0,
+        max: 1,
+        step: 0.0001
+      },
+      {
+        name: 'lightIntensity',
+        default: 1,
+        min: 0,
+        max: 10,
         step: 0.0001
       }
     ]

@@ -25,11 +25,6 @@ const mode: Ref<ModeType> = ref('')
 
     <div class="content">
       <div v-if="mode === 'control'" id="controller">
-        <fieldset>
-          <legend>Info</legend>
-          FPS: {{ humanReadable(fps) }}<br />
-          Iteration: {{ app.iteration }}<br />
-        </fieldset>
         <template v-for="category of parameterProps" :key="category.name">
           <fieldset>
             <legend class="pointer" @click="category.visible = !category.visible">
@@ -50,10 +45,6 @@ const mode: Ref<ModeType> = ref('')
                     @dblclick="parameter[prop.name as keyof typeof parameter] = prop.default"
                   />
                 </label>
-                <!-- <i
-              class="bi bi-arrow-counterclockwise"
-              @click="parameter[prop.name as keyof typeof parameter] = prop.default"
-            ></i> -->
                 <span style="float: right">
                   {{ humanReadable(parameter[prop.name as keyof typeof parameter]) }}
                 </span>
@@ -67,6 +58,11 @@ const mode: Ref<ModeType> = ref('')
           <button @click="app.reset = true">Clear</button><br />
           <button @click="resetParameter">Reset parameter</button><br />
           <!-- <button @click="randomParameter">random</button><br /> -->
+        </fieldset>
+        <fieldset>
+          <legend>Info</legend>
+          FPS: {{ humanReadable(fps) }}<br />
+          Iteration: {{ app.iteration }}<br />
         </fieldset>
       </div>
       <div v-if="mode === 'info'">

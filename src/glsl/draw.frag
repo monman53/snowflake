@@ -8,6 +8,7 @@ uniform vec2 canvasSize;
 uniform vec2 computeSize;
 uniform float rot;
 uniform float lightAngle;
+uniform float lightIntensity;
 uniform float hue;
 uniform float saturation;
 uniform float lightness;
@@ -103,7 +104,8 @@ void main() {
     float alpha = 1.0f;
     if(a > 0.5f) {
         float angle = lightAngle * 2.f * M_PI;
-        float color = -dot(gradC, vec2(cos(angle), sin(angle)));
+        vec2 lightVec = lightIntensity * vec2(cos(angle), sin(angle));
+        float color = -dot(gradC, lightVec);
         outColor = vec4(background + vec3(color), alpha);
     } else {
         outColor = vec4(vec3(background), alpha);
