@@ -80,7 +80,11 @@ const setParameter = (t: any) => {
         </fieldset>
       </div>
       <div v-if="mode === 'info'">
-        <p>TBD</p>
+        <p>
+          This is an implementation of J. Gravner, D. Griffeath,
+          <i>MODELING SNOW CRYSTAL GROWTH II: A mesoscopic lattice map with plausible dynamics</i>
+          Physica D: Nonlinear Phenomena, Volume 237, Issue 3, 2008, Pages 385-404
+        </p>
       </div>
     </div>
     <div v-if="mode !== ''" class="footer">

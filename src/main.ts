@@ -279,7 +279,7 @@ export const parameterProps = ref([
       },
       {
         name: 'lightness',
-        default: 0.65,
+        default: 0.75,
         min: 0,
         max: 1,
         step: 0.0001
