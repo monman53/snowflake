@@ -79,13 +79,15 @@ void main() {
     vec2 pos = gl_FragCoord.xy;
     vec4 value = getValue(pos);
     vec4 gradX, gradY;
+    float coef2 = 0.2f;
+    // float coef2 = 0.f;
     // x
     {
         vec4 v1 = getValue(vec2(pos.x - 2.0f, pos.y));
         vec4 v2 = getValue(vec2(pos.x - 1.0f, pos.y));
         vec4 v3 = getValue(vec2(pos.x + 1.0f, pos.y));
         vec4 v4 = getValue(vec2(pos.x + 2.0f, pos.y));
-        gradX = -0.2f * v1 - v2 + v3 + 0.2f * v4;
+        gradX = -coef2 * v1 - v2 + v3 + coef2 * v4;
     }
     // t
     {
@@ -93,16 +95,17 @@ void main() {
         vec4 v2 = getValue(vec2(pos.x, pos.y - 1.0f));
         vec4 v3 = getValue(vec2(pos.x, pos.y + 1.0f));
         vec4 v4 = getValue(vec2(pos.x, pos.y + 2.0f));
-        gradY = -0.2f * v1 - v2 + v3 + 0.2f * v4;
+        gradY = -coef2 * v1 - v2 + v3 + coef2 * v4;
     }
     vec2 gradC = vec2(gradX.z, gradY.z);
 
     float a = value.x;
-    float c = value.z;
-    float d = value.w;
+    // float c = value.z;
+    // float d = value.w;
     vec3 background = hsl2rgb(hue, saturation, lightness);
     float alpha = 1.0f;
     if(a > 0.5f) {
+    // if(true) {
         float angle = lightAngle * 2.f * M_PI;
         vec2 lightVec = lightIntensity * vec2(cos(angle), sin(angle));
         float shadow = dot(gradC, lightVec);
