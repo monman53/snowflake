@@ -242,6 +242,72 @@ export const parameterTemplates = [
     sigma: 0
   },
   {
+    name: '12a',
+    rho: 0.5,
+    beta: 1.4,
+    alpha: 0.1,
+    theta: 0.005,
+    kappa: 0.001,
+    mu: 0.04,
+    gamma: 0.001,
+    sigma: 0
+  },
+  {
+    name: '12b',
+    rho: 0.5,
+    beta: 1.4,
+    alpha: 0.1,
+    theta: 0.005,
+    kappa: 0.001,
+    mu: 0.05,
+    gamma: 0.001,
+    sigma: 0
+  },
+  {
+    name: '12c',
+    rho: 0.5,
+    beta: 1.4,
+    alpha: 0.1,
+    theta: 0.005,
+    kappa: 0.001,
+    mu: 0.06,
+    gamma: 0.001,
+    sigma: 0
+  },
+  {
+    name: '12d',
+    rho: 0.5,
+    beta: 1.4,
+    alpha: 0.1,
+    theta: 0.005,
+    kappa: 0.001,
+    mu: 0.07,
+    gamma: 0.001,
+    sigma: 0
+  },
+  {
+    name: '12e',
+    rho: 0.5,
+    beta: 1.4,
+    alpha: 0.1,
+    theta: 0.005,
+    kappa: 0.001,
+    mu: 0.08,
+    gamma: 0.001,
+    sigma: 0
+  },
+  {
+    name: '12f',
+    rho: 0.5,
+    beta: 1.4,
+    alpha: 0.1,
+    theta: 0.005,
+    kappa: 0.001,
+    mu: 0.09,
+    gamma: 0.001,
+    sigma: 0
+  },
+  {
     // Simple star
     name: '13l',
     rho: 0.65,
