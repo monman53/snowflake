@@ -340,6 +340,39 @@ export const parameterTemplates = [
     mu: 0.14,
     gamma: 0.00001,
     sigma: 0
+  },
+  {
+    name: '16l',
+    rho: 0.66,
+    beta: 1.6,
+    alpha: 0.4,
+    theta: 0.025,
+    kappa: 0.075,
+    mu: 0.015,
+    gamma: 0.00005,
+    sigma: 0.000006
+  },
+  {
+    name: '16m',
+    rho: 0.65,
+    beta: 1.6,
+    alpha: 0.2,
+    theta: 0.0245,
+    kappa: 0.1,
+    mu: 0.015,
+    gamma: 0.00005,
+    sigma: 0.00001
+  },
+  {
+    name: '16r',
+    rho: 0.8,
+    beta: 2.6,
+    alpha: 0.006,
+    theta: 0.005,
+    kappa: 0.05,
+    mu: 0.015,
+    gamma: 0.0001,
+    sigma: 0.00005
   }
   // {
   //   name: '',

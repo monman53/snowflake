@@ -110,6 +110,6 @@ void main() {
         // outColor = vec4(vec3(c), alpha);
     } else {
         outColor = vec4(vec3(background), alpha);
-        // outColor = vec4(vec3(d), alpha);
+        // outColor = vec4(vec3(d * 0.2f), alpha);
     }
 }
