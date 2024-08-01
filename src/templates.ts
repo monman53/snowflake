@@ -8,7 +8,7 @@ export const parameterTemplates = [
     kappa: 0.05,
     mu: 0.015,
     gamma: 0.0001,
-    sigma: 0
+    sigma: 0 // .00002b
   },
   {
     name: '2br',
@@ -41,7 +41,7 @@ export const parameterTemplates = [
     kappa: 0.05,
     mu: 0.015,
     gamma: 0.0001,
-    sigma: 0
+    sigma: 0 // .00005b
   },
   {
     name: '9a',
@@ -110,6 +110,138 @@ export const parameterTemplates = [
     sigma: 0
   },
   {
+    name: '10a',
+    rho: 0.8,
+    beta: 1.9,
+    alpha: 0.004,
+    theta: 0.001,
+    kappa: 0.05,
+    mu: 0.015,
+    gamma: 0.0001,
+    sigma: 0
+  },
+  {
+    name: '10b',
+    rho: 0.8,
+    beta: 2.2,
+    alpha: 0.004,
+    theta: 0.001,
+    kappa: 0.05,
+    mu: 0.015,
+    gamma: 0.0001,
+    sigma: 0
+  },
+  {
+    name: '10c',
+    rho: 0.8,
+    beta: 2.4,
+    alpha: 0.004,
+    theta: 0.001,
+    kappa: 0.05,
+    mu: 0.015,
+    gamma: 0.0001,
+    sigma: 0
+  },
+  {
+    name: '10d',
+    rho: 0.8,
+    beta: 2.6,
+    alpha: 0.004,
+    theta: 0.001,
+    kappa: 0.05,
+    mu: 0.015,
+    gamma: 0.0001,
+    sigma: 0
+  },
+  {
+    name: '10e',
+    rho: 0.8,
+    beta: 2.7,
+    alpha: 0.004,
+    theta: 0.001,
+    kappa: 0.05,
+    mu: 0.015,
+    gamma: 0.0001,
+    sigma: 0
+  },
+  {
+    name: '10f',
+    rho: 0.8,
+    beta: 2.8,
+    alpha: 0.004,
+    theta: 0.001,
+    kappa: 0.05,
+    mu: 0.015,
+    gamma: 0.0001,
+    sigma: 0
+  },
+  {
+    name: '11a',
+    rho: 0.635,
+    beta: 1.6,
+    alpha: 0.4,
+    theta: 0.025,
+    kappa: 0.001,
+    mu: 0.015,
+    gamma: 0.0005,
+    sigma: 0
+  },
+  {
+    name: '11b',
+    rho: 0.635,
+    beta: 1.6,
+    alpha: 0.4,
+    theta: 0.025,
+    kappa: 0.0025,
+    mu: 0.015,
+    gamma: 0.0005,
+    sigma: 0
+  },
+  {
+    name: '11c',
+    rho: 0.635,
+    beta: 1.6,
+    alpha: 0.4,
+    theta: 0.025,
+    kappa: 0.005,
+    mu: 0.015,
+    gamma: 0.0005,
+    sigma: 0
+  },
+  {
+    name: '11d',
+    rho: 0.635,
+    beta: 1.6,
+    alpha: 0.4,
+    theta: 0.025,
+    kappa: 0.0075,
+    mu: 0.015,
+    gamma: 0.0005,
+    sigma: 0
+  },
+  {
+    name: '11e',
+    rho: 0.635,
+    beta: 1.6,
+    alpha: 0.4,
+    theta: 0.025,
+    kappa: 0.01,
+    mu: 0.015,
+    gamma: 0.0005,
+    sigma: 0
+  },
+  {
+    name: '11f',
+    rho: 0.635,
+    beta: 1.6,
+    alpha: 0.4,
+    theta: 0.025,
+    kappa: 0.02,
+    mu: 0.015,
+    gamma: 0.0005,
+    sigma: 0
+  },
+  {
     // Simple star
     name: '13l',
     rho: 0.65,
@@ -140,7 +272,7 @@ export const parameterTemplates = [
     theta: 0.112,
     kappa: 0.001,
     mu: 0.14,
-    gamma: 0.0006,
+    gamma: 0.00001,
     sigma: 0
   }
   // {
