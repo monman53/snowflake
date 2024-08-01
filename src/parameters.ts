@@ -21,7 +21,8 @@ export const parameter = ref({
   lightHue1: 0.0,
   lightHue2: 0.0,
   lightSaturation: 0.8,
-  lightLightness: 0.5
+  lightLightness: 0.5,
+  gradationScale: 0.0
 })
 
 export const parameterProps = ref([
@@ -29,27 +30,27 @@ export const parameterProps = ref([
     name: 'Display',
     visible: true,
     props: [
-      {
-        name: 'hue',
-        default: 0.6,
-        min: 0,
-        max: 1,
-        step: 0.0001
-      },
-      {
-        name: 'saturation',
-        default: 0.8,
-        min: 0,
-        max: 1,
-        step: 0.0001
-      },
-      {
-        name: 'lightness',
-        default: 0.75,
-        min: 0,
-        max: 1,
-        step: 0.0001
-      },
+      // {
+      //   name: 'hue',
+      //   default: 0.6,
+      //   min: 0,
+      //   max: 1,
+      //   step: 0.0001
+      // },
+      // {
+      //   name: 'saturation',
+      //   default: 0.8,
+      //   min: 0,
+      //   max: 1,
+      //   step: 0.0001
+      // },
+      // {
+      //   name: 'lightness',
+      //   default: 0.75,
+      //   min: 0,
+      //   max: 1,
+      //   step: 0.0001
+      // },
       {
         name: 'rot',
         default: 1 / 12,
@@ -101,10 +102,17 @@ export const parameterProps = ref([
       },
       {
         name: 'lightLightness',
-        default: 0.5,
+        default: 0.7,
         min: 0,
         max: 1,
         step: 0.0001
+      },
+      {
+        name: 'gradationScale',
+        default: 2048,
+        min: 1024,
+        max: 4098,
+        step: 0.01
       }
     ]
   },

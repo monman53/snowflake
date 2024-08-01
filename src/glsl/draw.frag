@@ -17,6 +17,7 @@ uniform float lightHue1;
 uniform float lightHue2;
 uniform float lightSaturation;
 uniform float lightLightness;
+uniform float gradationScale;
 
 out vec4 outColor;
 
@@ -82,7 +83,7 @@ vec4 getValue(vec2 fragCoord) {
 
 void main() {
     vec2 pos = gl_FragCoord.xy;
-    vec2 posCenter = pos - float(computeRadius);
+    vec2 posCenter = pos - canvasSize / 2.f;
     vec4 value = getValue(pos);
     vec4 gradX, gradY;
     float coef2 = 0.2f;
@@ -108,25 +109,31 @@ void main() {
     float a = value.x;
     // float c = value.z;
     // float d = value.w;
-    vec3 background = hsl2rgb(hue, saturation, lightness);
+    float angle1 = lightAngle * 2.f * M_PI;
+    float angle2 = (lightAngle + 1.0f / 6.0f) * 2.f * M_PI;
+
+    vec2 lightVec1 = vec2(cos(angle1), sin(angle1));
+    vec2 lightVec2 = vec2(cos(angle2), sin(angle2));
+    vec3 background1 = hsl2rgb(lightHue1, lightSaturation, lightLightness * (dot(posCenter, -lightVec1) / gradationScale + 0.5f));
+    vec3 background2 = hsl2rgb(lightHue2, lightSaturation, lightLightness * (dot(posCenter, -lightVec2) / gradationScale + 0.5f));
+    // vec3 background = background1 + background2;
+    vec3 background = max(background1, background2);
+    // vec3 background = background1;
+
     float alpha = 1.0f;
     if(a > 0.5f) {
     // if(true) {
-        float angle1 = lightAngle * 2.f * M_PI;
-        float angle2 = (lightAngle + 1.0f / 6.0f) * 2.f * M_PI;
-
-        vec2 lightVec1 = vec2(cos(angle1), sin(angle1));
-        vec2 lightVec2 = vec2(cos(angle2), sin(angle2));
 
         vec3 lightColor1 = hsl2rgb(lightHue1, lightSaturation, lightLightness);
         vec3 lightColor2 = hsl2rgb(lightHue2, lightSaturation, lightLightness);
 
-        float light1 = lightIntensity * max(dot(gradC, lightVec1), 0.f);
-        float light2 = lightIntensity * max(dot(gradC, lightVec2), 0.f);
+        float light1 = max(dot(gradC, lightVec1), 0.f);
+        float light2 = max(dot(gradC, lightVec2), 0.f);
 
         vec3 colorLight1 = lightColor1 * light1;
         vec3 colorLight2 = lightColor2 * light2;
-        vec3 colorLight = colorLight1 + colorLight2;
+        // vec3 colorLight = lightIntensity * (colorLight1 + colorLight2);
+        vec3 colorLight = lightIntensity * max(colorLight1, colorLight2);
 
         float shadowness = length(gradC) * shadow;
 

@@ -135,7 +135,8 @@ onMounted(() => {
     lightHue1: gl.getUniformLocation(drawProgram, 'lightHue1'),
     lightHue2: gl.getUniformLocation(drawProgram, 'lightHue2'),
     lightSaturation: gl.getUniformLocation(drawProgram, 'lightSaturation'),
-    lightLightness: gl.getUniformLocation(drawProgram, 'lightLightness')
+    lightLightness: gl.getUniformLocation(drawProgram, 'lightLightness'),
+    gradationScale: gl.getUniformLocation(drawProgram, 'gradationScale')
   }
 
   //--------------------------------
@@ -378,6 +379,7 @@ onMounted(() => {
     gl.uniform1f(drawProgLocs.lightHue2, parameter.value.lightHue2)
     gl.uniform1f(drawProgLocs.lightSaturation, parameter.value.lightSaturation)
     gl.uniform1f(drawProgLocs.lightLightness, parameter.value.lightLightness)
+    gl.uniform1f(drawProgLocs.gradationScale, parameter.value.gradationScale)
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null)
     gl.bindTexture(gl.TEXTURE_2D, computeTex1)
