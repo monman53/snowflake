@@ -1,9 +1,7 @@
 import { ref } from 'vue'
 
 export const parameter = ref({
-  lightAngle: 0,
-  lightIntensity: 1.0,
-  rot: 0,
+  // Shape parameter
   rho: 1.0,
   beta: 2.2,
   alpha: 1.0,
@@ -12,15 +10,107 @@ export const parameter = ref({
   mu: 1.0,
   gamma: 1.0,
   sigma: 1.0,
+  // Display parameter
+  lightAngle: 0,
+  lightIntensity: 1.0,
+  rot: 0,
   hue: 0,
   saturation: 0,
-  lightness: 0
+  lightness: 0,
+  shadow: 1.0,
+  lightHue1: 0.0,
+  lightHue2: 0.0,
+  lightSaturation: 0.8,
+  lightLightness: 0.5
 })
 
 export const parameterProps = ref([
   {
-    name: 'Parameters',
+    name: 'Display',
     visible: true,
+    props: [
+      {
+        name: 'hue',
+        default: 0.6,
+        min: 0,
+        max: 1,
+        step: 0.0001
+      },
+      {
+        name: 'saturation',
+        default: 0.8,
+        min: 0,
+        max: 1,
+        step: 0.0001
+      },
+      {
+        name: 'lightness',
+        default: 0.75,
+        min: 0,
+        max: 1,
+        step: 0.0001
+      },
+      {
+        name: 'rot',
+        default: 1 / 12,
+        min: 0,
+        max: 1,
+        step: 0.0001
+      },
+      {
+        name: 'lightAngle',
+        default: 0,
+        min: 0,
+        max: 1,
+        step: 0.0001
+      },
+      {
+        name: 'lightIntensity',
+        default: 4.0,
+        min: 0,
+        max: 10,
+        step: 0.0001
+      },
+      {
+        name: 'shadow',
+        default: 1.0,
+        min: 0,
+        max: 2,
+        step: 0.0001
+      },
+      {
+        name: 'lightHue1',
+        default: 0.17,
+        min: 0,
+        max: 1,
+        step: 0.0001
+      },
+      {
+        name: 'lightHue2',
+        default: 0.72,
+        min: 0,
+        max: 1,
+        step: 0.0001
+      },
+      {
+        name: 'lightSaturation',
+        default: 0.8,
+        min: 0,
+        max: 1,
+        step: 0.0001
+      },
+      {
+        name: 'lightLightness',
+        default: 0.5,
+        min: 0,
+        max: 1,
+        step: 0.0001
+      }
+    ]
+  },
+  {
+    name: 'Parameters',
+    visible: false,
     props: [
       {
         name: 'rho',
@@ -77,54 +167,6 @@ export const parameterProps = ref([
         min: 0,
         max: 0.0001,
         step: 0.000001
-      }
-    ]
-  },
-  {
-    name: 'Display',
-    visible: false,
-    props: [
-      {
-        name: 'hue',
-        default: 0.6,
-        min: 0,
-        max: 1,
-        step: 0.0001
-      },
-      {
-        name: 'saturation',
-        default: 0.8,
-        min: 0,
-        max: 1,
-        step: 0.0001
-      },
-      {
-        name: 'lightness',
-        default: 0.75,
-        min: 0,
-        max: 1,
-        step: 0.0001
-      },
-      {
-        name: 'rot',
-        default: 1 / 12,
-        min: 0,
-        max: 1,
-        step: 0.0001
-      },
-      {
-        name: 'lightAngle',
-        default: 0,
-        min: 0,
-        max: 1,
-        step: 0.0001
-      },
-      {
-        name: 'lightIntensity',
-        default: 1.5,
-        min: 0,
-        max: 10,
-        step: 0.0001
       }
     ]
   }

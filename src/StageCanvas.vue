@@ -130,7 +130,12 @@ onMounted(() => {
     lightIntensity: gl.getUniformLocation(drawProgram, 'lightIntensity'),
     hue: gl.getUniformLocation(drawProgram, 'hue'),
     saturation: gl.getUniformLocation(drawProgram, 'saturation'),
-    lightness: gl.getUniformLocation(drawProgram, 'lightness')
+    lightness: gl.getUniformLocation(drawProgram, 'lightness'),
+    shadow: gl.getUniformLocation(drawProgram, 'shadow'),
+    lightHue1: gl.getUniformLocation(drawProgram, 'lightHue1'),
+    lightHue2: gl.getUniformLocation(drawProgram, 'lightHue2'),
+    lightSaturation: gl.getUniformLocation(drawProgram, 'lightSaturation'),
+    lightLightness: gl.getUniformLocation(drawProgram, 'lightLightness')
   }
 
   //--------------------------------
@@ -360,14 +365,19 @@ onMounted(() => {
     gl.useProgram(drawProgram)
 
     gl.uniform1i(drawProgLocs.computeTex, 0)
+    gl.uniform2f(drawProgLocs.canvasSize, app.value.width, app.value.height)
+    gl.uniform1i(drawProgLocs.computeRadius, app.value.computeRadius)
     gl.uniform1f(drawProgLocs.rot, parameter.value.rot)
     gl.uniform1f(drawProgLocs.lightAngle, parameter.value.lightAngle)
     gl.uniform1f(drawProgLocs.lightIntensity, parameter.value.lightIntensity)
     gl.uniform1f(drawProgLocs.hue, parameter.value.hue)
     gl.uniform1f(drawProgLocs.saturation, parameter.value.saturation)
     gl.uniform1f(drawProgLocs.lightness, parameter.value.lightness)
-    gl.uniform2f(drawProgLocs.canvasSize, app.value.width, app.value.height)
-    gl.uniform1i(drawProgLocs.computeRadius, app.value.computeRadius)
+    gl.uniform1f(drawProgLocs.shadow, parameter.value.shadow)
+    gl.uniform1f(drawProgLocs.lightHue1, parameter.value.lightHue1)
+    gl.uniform1f(drawProgLocs.lightHue2, parameter.value.lightHue2)
+    gl.uniform1f(drawProgLocs.lightSaturation, parameter.value.lightSaturation)
+    gl.uniform1f(drawProgLocs.lightLightness, parameter.value.lightLightness)
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null)
     gl.bindTexture(gl.TEXTURE_2D, computeTex1)
