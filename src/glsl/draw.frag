@@ -4,7 +4,7 @@ precision highp float;
 
 uniform sampler2D computeTex;
 
-uniform vec2 canvasSize;
+uniform ivec2 canvasSize;
 uniform int computeRadius;
 uniform float rot;
 uniform float lightAngle;
@@ -68,7 +68,7 @@ vec3 hsl2rgb(float h, float s, float l) {
 }
 
 vec4 getValue(vec2 fragCoord) {
-    vec2 fragPos = fragCoord - canvasSize * 0.5f;
+    vec2 fragPos = fragCoord - vec2(canvasSize / 2);
     float angle = rot * M_PI * 2.f;
     float co = cos(angle);
     float si = sin(angle);
@@ -84,7 +84,7 @@ vec4 getValue(vec2 fragCoord) {
 }
 
 vec3 getColor(vec2 pos) {
-    vec2 posCenter = pos - canvasSize / 2.f;
+    vec2 posCenter = pos - vec2(canvasSize / 2);
     vec4 value = getValue(pos);
     vec4 gradX, gradY;
     float coef2 = 0.2f;
@@ -147,13 +147,13 @@ vec3 getColor(vec2 pos) {
 
 void main() {
     vec2 pos = gl_FragCoord.xy;
-    vec2 posCenter = pos - canvasSize / 2.f;
+    vec2 posCenter = pos - vec2(canvasSize / 2);
     float alpha = 1.0f;
     if(chromaticAberration > 0.f) {
         float r = 1.0f + chromaticAberration;
-        vec3 color1 = getColor((pos - canvasSize * 0.5f) / r + canvasSize * 0.5f);
+        vec3 color1 = getColor(posCenter / r + vec2(canvasSize / 2));
         vec3 color2 = getColor(pos);
-        vec3 color3 = getColor((pos - canvasSize * 0.5f) * r + canvasSize * 0.5f);
+        vec3 color3 = getColor(posCenter * r + vec2(canvasSize / 2));
         outColor = vec4(color1.r, color2.g, color3.b, alpha);
     } else {
         vec3 color = getColor(pos);

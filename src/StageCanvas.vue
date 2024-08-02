@@ -395,7 +395,7 @@ onMounted(() => {
     gl.useProgram(drawProgram)
 
     gl.uniform1i(drawProgLocs.computeTex, 0)
-    gl.uniform2f(drawProgLocs.canvasSize, app.value.width, app.value.height)
+    gl.uniform2i(drawProgLocs.canvasSize, app.value.width, app.value.height)
     gl.uniform1i(drawProgLocs.computeRadius, app.value.computeRadius)
     gl.uniform1f(drawProgLocs.rot, parameter.value.rot)
     gl.uniform1f(drawProgLocs.lightAngle, parameter.value.lightAngle)
