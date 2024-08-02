@@ -23,16 +23,6 @@ vec4 getValue(sampler2D texture, ivec2 pos) {
 
 ivec2 nei[7] = ivec2[](ivec2(0, 0), ivec2(1, 0), ivec2(0, 1), ivec2(-1, 1), ivec2(-1, 0), ivec2(0, -1), ivec2(1, -1));
 
-int countA(sampler2D texture, ivec2 pos) {
-    int count = 0;
-    for(int i = 0; i < 7; i++) {
-        if(getValue(texture, pos + nei[i]).x > 0.5f) {
-            count++;
-        }
-    }
-    return count;
-}
-
 void main() {
     ivec2 pos = ivec2(gl_FragCoord.xy);
     ivec2 center = ivec2(computeRadius);
