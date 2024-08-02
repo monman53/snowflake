@@ -147,6 +147,7 @@ vec3 getColor(vec2 pos) {
 
 void main() {
     vec2 pos = gl_FragCoord.xy;
+    vec2 posCenter = pos - canvasSize / 2.f;
     float alpha = 1.0f;
     if(chromaticAberration > 0.f) {
         float r = 1.0f + chromaticAberration;
@@ -158,4 +159,7 @@ void main() {
         vec3 color = getColor(pos);
         outColor = vec4(color, alpha);
     }
+    // if(length(posCenter) > min(canvasSize.x, canvasSize.y) * 0.5f * 0.95f) {
+    //     outColor = vec4(vec3(0.f), alpha);
+    // }
 }
