@@ -22,7 +22,8 @@ export const parameter = ref({
   lightHue2: 0.0,
   lightSaturation: 0.8,
   lightLightness: 0.5,
-  gradationScale: 0.0
+  gradationScale: 0.0,
+  chromaticAberration: 0.0
 })
 
 export const parameterProps = ref([
@@ -113,6 +114,13 @@ export const parameterProps = ref([
         min: 1024,
         max: 4098,
         step: 0.01
+      },
+      {
+        name: 'chromaticAberration',
+        default: 0,
+        min: 0,
+        max: 0.1,
+        step: 0.0001
       }
     ]
   },

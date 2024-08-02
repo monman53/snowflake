@@ -18,6 +18,7 @@ uniform float lightHue2;
 uniform float lightSaturation;
 uniform float lightLightness;
 uniform float gradationScale;
+uniform float chromaticAberration;
 
 out vec4 outColor;
 
@@ -82,8 +83,7 @@ vec4 getValue(vec2 fragCoord) {
     return value;
 }
 
-void main() {
-    vec2 pos = gl_FragCoord.xy;
+vec3 getColor(vec2 pos) {
     vec2 posCenter = pos - canvasSize / 2.f;
     vec4 value = getValue(pos);
     vec4 gradX, gradY;
@@ -121,7 +121,6 @@ void main() {
     vec3 background = max(background1, background2);
     // vec3 background = background1;
 
-    float alpha = 1.0f;
     if(a > 0.5f) {
     // if(true) {
 
@@ -138,10 +137,25 @@ void main() {
 
         float shadowness = length(gradC) * shadow;
 
-        outColor = vec4(background - shadowness + colorLight, alpha);
+        return vec3(background - shadowness + colorLight);
         // outColor = vec4(vec3(c), alpha);
     } else {
-        outColor = vec4(vec3(background), alpha);
+        return vec3(background);
         // outColor = vec4(vec3(d), alpha);
+    }
+}
+
+void main() {
+    vec2 pos = gl_FragCoord.xy;
+    float alpha = 1.0f;
+    if(chromaticAberration > 0.f) {
+        float r = 1.0f + chromaticAberration;
+        vec3 color1 = getColor((pos - canvasSize * 0.5f) / r + canvasSize * 0.5f);
+        vec3 color2 = getColor(pos);
+        vec3 color3 = getColor((pos - canvasSize * 0.5f) * r + canvasSize * 0.5f);
+        outColor = vec4(color1.r, color2.g, color3.b, alpha);
+    } else {
+        vec3 color = getColor(pos);
+        outColor = vec4(color, alpha);
     }
 }
