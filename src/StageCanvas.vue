@@ -213,7 +213,7 @@ onMounted(() => {
   const computeTex2 = createTexture(gl)
   const computeTex3 = createTexture(gl)
   const computeTex4 = createTexture(gl)
-  const computeTex5 = createTexture(gl, gl.LINEAR)
+  // const computeTex5 = createTexture(gl)
 
   // Setup destination texture
   // Create and bind the framebuffer
@@ -231,7 +231,7 @@ onMounted(() => {
   const fb2 = createFrameBuffer(gl, computeTex2)
   const fb3 = createFrameBuffer(gl, computeTex3)
   const fb4 = createFrameBuffer(gl, computeTex4)
-  const fb5 = createFrameBuffer(gl, computeTex5)
+  // const fb5 = createFrameBuffer(gl, computeTex5)
 
   //================================
   // Frame render function
@@ -347,16 +347,16 @@ onMounted(() => {
       //--------------------------------
       // (experimental)
       //--------------------------------
-      tex = computeTex1
-      fb = fb5
-      gl.useProgram(computeProgram5)
-      gl.bindVertexArray(computeVA5)
-      gl.uniform1i(computeProgLocs5.computeTex, 0)
-      gl.uniform1f(computeProgLocs5.time, time)
-      gl.uniform1i(computeProgLocs5.computeRadius, app.value.computeRadius)
-      gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
-      gl.bindTexture(gl.TEXTURE_2D, tex)
-      gl.drawArrays(gl.TRIANGLES, 0, 6)
+      // tex = computeTex1
+      // fb = fb5
+      // gl.useProgram(computeProgram5)
+      // gl.bindVertexArray(computeVA5)
+      // gl.uniform1i(computeProgLocs5.computeTex, 0)
+      // gl.uniform1f(computeProgLocs5.time, time)
+      // gl.uniform1i(computeProgLocs5.computeRadius, app.value.computeRadius)
+      // gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
+      // gl.bindTexture(gl.TEXTURE_2D, tex)
+      // gl.drawArrays(gl.TRIANGLES, 0, 6)
 
       app.value.iteration += 1
     }
@@ -384,13 +384,19 @@ onMounted(() => {
     gl.uniform1f(drawProgLocs.gradationScale, parameter.value.gradationScale)
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null)
-    gl.bindTexture(gl.TEXTURE_2D, computeTex5)
     gl.bindVertexArray(drawVA)
     gl.viewport(0, 0, app.value.width, app.value.height)
+
+    gl.bindTexture(gl.TEXTURE_2D, computeTex1)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
 
     gl.clearColor(0, 0, 0, 1)
     gl.clear(gl.COLOR_BUFFER_BIT)
     gl.drawArrays(gl.TRIANGLES, 0, 6)
+
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
 
     // Next frame
     window.requestAnimationFrame(render)
