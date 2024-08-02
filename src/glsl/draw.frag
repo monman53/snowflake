@@ -9,9 +9,9 @@ uniform int computeRadius;
 uniform float rot;
 uniform float lightAngle;
 uniform float lightIntensity;
-uniform float hue;
-uniform float saturation;
-uniform float lightness;
+// uniform float hue;
+// uniform float saturation;
+// uniform float lightness;
 uniform float shadow;
 uniform float lightHue1;
 uniform float lightHue2;
@@ -96,7 +96,7 @@ void main() {
         vec4 v4 = getValue(vec2(pos.x + 2.0f, pos.y));
         gradX = -coef2 * v1 - v2 + v3 + coef2 * v4;
     }
-    // t
+    // y
     {
         vec4 v1 = getValue(vec2(pos.x, pos.y - 2.0f));
         vec4 v2 = getValue(vec2(pos.x, pos.y - 1.0f));

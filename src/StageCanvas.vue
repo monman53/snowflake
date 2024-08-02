@@ -111,15 +111,15 @@ onMounted(() => {
     computeTex: gl.getUniformLocation(computeProgram4, 'computeTex'),
     computeRadius: gl.getUniformLocation(computeProgram4, 'computeRadius'),
     mu: gl.getUniformLocation(computeProgram4, 'mu'),
-    gamma: gl.getUniformLocation(computeProgram4, 'gamma')
+    gamma: gl.getUniformLocation(computeProgram4, 'gamma'),
+    sigma: gl.getUniformLocation(computeProgram4, 'sigma')
   }
 
   const computeProgram5 = createProgram(gl, [computeVS, computeFS5])
   const computeProgLocs5 = {
     time: gl.getUniformLocation(computeProgram5, 'time'),
     computeTex: gl.getUniformLocation(computeProgram5, 'computeTex'),
-    computeRadius: gl.getUniformLocation(computeProgram5, 'computeRadius'),
-    sigma: gl.getUniformLocation(computeProgram5, 'sigma')
+    computeRadius: gl.getUniformLocation(computeProgram5, 'computeRadius')
   }
 
   const drawProgram = createProgram(gl, [drawVS, drawFS])
@@ -203,8 +203,8 @@ onMounted(() => {
     )
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, param)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, param)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+    // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+    // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
     return tex
   }
   // const srcTex = createTexture(gl)
@@ -213,7 +213,7 @@ onMounted(() => {
   const computeTex2 = createTexture(gl)
   const computeTex3 = createTexture(gl)
   const computeTex4 = createTexture(gl)
-  const computeTex5 = createTexture(gl)
+  const computeTex5 = createTexture(gl, gl.LINEAR)
 
   // Setup destination texture
   // Create and bind the framebuffer
@@ -328,35 +328,35 @@ onMounted(() => {
       gl.drawArrays(gl.TRIANGLES, 0, 6)
 
       //--------------------------------
-      // (4)
+      // (4), (5)
       //--------------------------------
       tex = computeTex4
-      fb = fb5
+      fb = fb1
       gl.useProgram(computeProgram4)
       gl.bindVertexArray(computeVA4)
       gl.uniform1i(computeProgLocs4.computeTex, 0)
       gl.uniform1f(computeProgLocs4.time, time)
       gl.uniform1f(computeProgLocs4.mu, parameter.value.mu)
       gl.uniform1f(computeProgLocs4.gamma, parameter.value.gamma)
+      gl.uniform1f(computeProgLocs4.sigma, parameter.value.sigma)
       gl.uniform1i(computeProgLocs4.computeRadius, app.value.computeRadius)
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
       gl.bindTexture(gl.TEXTURE_2D, tex)
       gl.drawArrays(gl.TRIANGLES, 0, 6)
 
       //--------------------------------
-      // (5)
+      // (experimental)
       //--------------------------------
-      tex = computeTex5
-      fb = fb1
-      gl.useProgram(computeProgram5)
-      gl.bindVertexArray(computeVA5)
-      gl.uniform1i(computeProgLocs5.computeTex, 0)
-      gl.uniform1f(computeProgLocs5.time, time)
-      gl.uniform1f(computeProgLocs5.sigma, parameter.value.sigma)
-      gl.uniform1i(computeProgLocs5.computeRadius, app.value.computeRadius)
-      gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
-      gl.bindTexture(gl.TEXTURE_2D, tex)
-      gl.drawArrays(gl.TRIANGLES, 0, 6)
+      // tex = computeTex1
+      // fb = fb5
+      // gl.useProgram(computeProgram5)
+      // gl.bindVertexArray(computeVA5)
+      // gl.uniform1i(computeProgLocs5.computeTex, 0)
+      // gl.uniform1f(computeProgLocs5.time, time)
+      // gl.uniform1i(computeProgLocs5.computeRadius, app.value.computeRadius)
+      // gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
+      // gl.bindTexture(gl.TEXTURE_2D, tex)
+      // gl.drawArrays(gl.TRIANGLES, 0, 6)
 
       app.value.iteration += 1
     }
