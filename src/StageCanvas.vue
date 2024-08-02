@@ -190,6 +190,7 @@ onMounted(() => {
     gl.bindTexture(gl.TEXTURE_2D, tex)
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1) // see https://webglfundamentals.org/webgl/lessons/webgl-data-textures.html
     gl.getExtension('EXT_color_buffer_float')
+    gl.getExtension('OES_texture_float_linear')
     gl.texImage2D(
       gl.TEXTURE_2D,
       0, // mip level
@@ -203,12 +204,11 @@ onMounted(() => {
     )
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, param)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, param)
-    // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-    // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
     return tex
   }
-  // const srcTex = createTexture(gl)
-  // const srcTexLoc = gl.getUniformLocation(computeProgram, 'srcTex')
+
   const computeTex1 = createTexture(gl)
   const computeTex2 = createTexture(gl)
   const computeTex3 = createTexture(gl)
@@ -347,16 +347,16 @@ onMounted(() => {
       //--------------------------------
       // (experimental)
       //--------------------------------
-      // tex = computeTex1
-      // fb = fb5
-      // gl.useProgram(computeProgram5)
-      // gl.bindVertexArray(computeVA5)
-      // gl.uniform1i(computeProgLocs5.computeTex, 0)
-      // gl.uniform1f(computeProgLocs5.time, time)
-      // gl.uniform1i(computeProgLocs5.computeRadius, app.value.computeRadius)
-      // gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
-      // gl.bindTexture(gl.TEXTURE_2D, tex)
-      // gl.drawArrays(gl.TRIANGLES, 0, 6)
+      tex = computeTex1
+      fb = fb5
+      gl.useProgram(computeProgram5)
+      gl.bindVertexArray(computeVA5)
+      gl.uniform1i(computeProgLocs5.computeTex, 0)
+      gl.uniform1f(computeProgLocs5.time, time)
+      gl.uniform1i(computeProgLocs5.computeRadius, app.value.computeRadius)
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
+      gl.bindTexture(gl.TEXTURE_2D, tex)
+      gl.drawArrays(gl.TRIANGLES, 0, 6)
 
       app.value.iteration += 1
     }
@@ -384,7 +384,7 @@ onMounted(() => {
     gl.uniform1f(drawProgLocs.gradationScale, parameter.value.gradationScale)
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null)
-    gl.bindTexture(gl.TEXTURE_2D, computeTex1)
+    gl.bindTexture(gl.TEXTURE_2D, computeTex5)
     gl.bindVertexArray(drawVA)
     gl.viewport(0, 0, app.value.width, app.value.height)
 

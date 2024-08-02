@@ -76,8 +76,9 @@ vec4 getValue(vec2 fragCoord) {
     fragPos.y *= 2.0f / sqrt(3.0f);
     fragPos.x -= fragPos.y * 0.5f;
     vec2 pos = vec2(fragPos + float(computeRadius));
-    ivec2 ipos = ivec2(pos);
-    vec4 value = texelFetch(computeTex, ipos, 0);
+    // ivec2 ipos = ivec2(pos);
+    // vec4 value = texelFetch(computeTex, ipos, 0);
+    vec4 value = texture(computeTex, pos / float(computeRadius * 2 + 1));
     return value;
 }
 
