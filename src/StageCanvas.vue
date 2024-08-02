@@ -1,4 +1,7 @@
-<script lang="ts"></script>
+<script lang="ts">
+// Canvases
+export const canvas = ref()
+</script>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
@@ -55,15 +58,14 @@ function createProgram(gl: WebGL2RenderingContext, shaderSources: string[]) {
   return program
 }
 
-// Canvases
-// const computeCanvas = new OffscreenCanvas(app.value.computeWidth, app.value.computeHeight)
-const canvas = ref()
-
 onMounted(() => {
-  const gl: WebGL2RenderingContext = canvas.value.getContext('webgl2')
+  const gl: WebGL2RenderingContext = canvas.value.getContext('webgl2', {
+    preserveDrawingBuffer: true
+  })
   if (gl === null) {
     throw new Error()
   }
+  // saveImage()
   // console.log(gl.getParameter(gl.MAX_VIEWPORT_DIMS))
 
   //--------------------------------

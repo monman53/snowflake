@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
 import { app, fps } from './main'
-import { humanReadable, resetAllParameter, resetParameter } from './utils'
+import { humanReadable, resetParameter } from './utils'
 import { parameterTemplates } from './templates'
 import { parameter, parameterProps } from './parameters'
+import { canvas } from './StageCanvas.vue'
+// import { saveImage } from './StageCanvas.vue'
 
 type ModeType = 'control' | 'info' | ''
 const mode: Ref<ModeType> = ref('')
@@ -22,6 +24,22 @@ const setParameter = (t: any) => {
   parameter.value.mu = t.mu
   parameter.value.gamma = t.gamma
   parameter.value.sigma = t.sigma
+}
+
+const saveImage = () => {
+  const link = document.createElement('a')
+  if (link === null) {
+    throw new Error()
+  }
+  link.download = 'snowflake.png'
+  link.href = canvas.value.toDataURL()
+  link.click()
+}
+
+const copyImage = () => {
+  canvas.value.toBlob((blob: any) => {
+    navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+  }, 'image/png')
 }
 </script>
 
@@ -49,6 +67,14 @@ const setParameter = (t: any) => {
             <i class="bi bi-skip-start-fill pointer" @click="app.reset = true"></i>
             <i v-if="!app.pause" class="bi bi-pause-fill pointer" @click="app.pause = true"></i>
             <i v-if="app.pause" class="bi bi-play-fill pointer" @click="app.pause = false"></i>
+            <span style="float: right">
+              <i
+                class="bi bi-camera pointer"
+                style="padding-left: 0.2em; padding-right: 0.2em"
+                @click="copyImage"
+              ></i>
+              <i class="bi bi-download pointer" @click="saveImage"></i>
+            </span>
           </span>
           <br />
           FPS: {{ humanReadable(fps) }}, Iteration: {{ app.iteration }}<br />
