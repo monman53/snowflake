@@ -239,6 +239,7 @@ onMounted(() => {
   //================================
   let counter = 0
   let then = 0
+  let profile = [0, 0, 0, 0, 0]
   const render = (time: number) => {
     if (gl === null) {
       throw new Error()
@@ -272,6 +273,7 @@ onMounted(() => {
 
       app.value.iteration = 0
       app.value.reset = false
+      profile = [0, 0, 0, 0, 0]
     }
 
     // Inner frame iteration
@@ -285,65 +287,89 @@ onMounted(() => {
       //--------------------------------
       // (1)
       //--------------------------------
-      let tex = computeTex1
-      let fb = fb2
-      gl.useProgram(computeProgram1)
-      gl.bindVertexArray(computeVA1)
-      gl.uniform1i(computeProgLocs1.computeTex, 0)
-      gl.uniform1f(computeProgLocs1.time, time)
-      gl.uniform1i(computeProgLocs1.computeRadius, app.value.computeRadius)
-      gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
-      gl.bindTexture(gl.TEXTURE_2D, tex)
-      gl.drawArrays(gl.TRIANGLES, 0, 6)
+      {
+        const tex = computeTex1
+        const fb = fb2
+        gl.useProgram(computeProgram1)
+        gl.bindVertexArray(computeVA1)
+        gl.uniform1i(computeProgLocs1.computeTex, 0)
+        gl.uniform1f(computeProgLocs1.time, time)
+        gl.uniform1i(computeProgLocs1.computeRadius, app.value.computeRadius)
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
+        gl.bindTexture(gl.TEXTURE_2D, tex)
+
+        const before = window.performance.now()
+        gl.drawArrays(gl.TRIANGLES, 0, 6)
+        const after = window.performance.now()
+        profile[0] += after - before
+      }
 
       //--------------------------------
       // (2)
       //--------------------------------
-      tex = computeTex2
-      fb = fb3
-      gl.useProgram(computeProgram2)
-      gl.bindVertexArray(computeVA2)
-      gl.uniform1i(computeProgLocs2.computeTex, 0)
-      gl.uniform1f(computeProgLocs2.time, time)
-      gl.uniform1i(computeProgLocs2.computeRadius, app.value.computeRadius)
-      gl.uniform1f(computeProgLocs2.kappa, parameter.value.kappa)
-      gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
-      gl.bindTexture(gl.TEXTURE_2D, tex)
-      gl.drawArrays(gl.TRIANGLES, 0, 6)
+      {
+        const tex = computeTex2
+        const fb = fb3
+        gl.useProgram(computeProgram2)
+        gl.bindVertexArray(computeVA2)
+        gl.uniform1i(computeProgLocs2.computeTex, 0)
+        gl.uniform1f(computeProgLocs2.time, time)
+        gl.uniform1i(computeProgLocs2.computeRadius, app.value.computeRadius)
+        gl.uniform1f(computeProgLocs2.kappa, parameter.value.kappa)
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
+        gl.bindTexture(gl.TEXTURE_2D, tex)
+
+        const before = window.performance.now()
+        gl.drawArrays(gl.TRIANGLES, 0, 6)
+        const after = window.performance.now()
+        profile[1] += after - before
+      }
 
       //--------------------------------
       // (3)
       //--------------------------------
-      tex = computeTex3
-      fb = fb4
-      gl.useProgram(computeProgram3)
-      gl.bindVertexArray(computeVA3)
-      gl.uniform1i(computeProgLocs3.computeTex, 0)
-      gl.uniform1f(computeProgLocs3.time, time)
-      gl.uniform1f(computeProgLocs3.beta, parameter.value.beta)
-      gl.uniform1f(computeProgLocs3.alpha, parameter.value.alpha)
-      gl.uniform1f(computeProgLocs3.theta, parameter.value.theta)
-      gl.uniform1i(computeProgLocs3.computeRadius, app.value.computeRadius)
-      gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
-      gl.bindTexture(gl.TEXTURE_2D, tex)
-      gl.drawArrays(gl.TRIANGLES, 0, 6)
+      {
+        const tex = computeTex3
+        const fb = fb4
+        gl.useProgram(computeProgram3)
+        gl.bindVertexArray(computeVA3)
+        gl.uniform1i(computeProgLocs3.computeTex, 0)
+        gl.uniform1f(computeProgLocs3.time, time)
+        gl.uniform1f(computeProgLocs3.beta, parameter.value.beta)
+        gl.uniform1f(computeProgLocs3.alpha, parameter.value.alpha)
+        gl.uniform1f(computeProgLocs3.theta, parameter.value.theta)
+        gl.uniform1i(computeProgLocs3.computeRadius, app.value.computeRadius)
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
+        gl.bindTexture(gl.TEXTURE_2D, tex)
+
+        const before = window.performance.now()
+        gl.drawArrays(gl.TRIANGLES, 0, 6)
+        const after = window.performance.now()
+        profile[2] += after - before
+      }
 
       //--------------------------------
       // (4), (5)
       //--------------------------------
-      tex = computeTex4
-      fb = fb1
-      gl.useProgram(computeProgram4)
-      gl.bindVertexArray(computeVA4)
-      gl.uniform1i(computeProgLocs4.computeTex, 0)
-      gl.uniform1f(computeProgLocs4.time, time)
-      gl.uniform1f(computeProgLocs4.mu, parameter.value.mu)
-      gl.uniform1f(computeProgLocs4.gamma, parameter.value.gamma)
-      gl.uniform1f(computeProgLocs4.sigma, parameter.value.sigma)
-      gl.uniform1i(computeProgLocs4.computeRadius, app.value.computeRadius)
-      gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
-      gl.bindTexture(gl.TEXTURE_2D, tex)
-      gl.drawArrays(gl.TRIANGLES, 0, 6)
+      {
+        const tex = computeTex4
+        const fb = fb1
+        gl.useProgram(computeProgram4)
+        gl.bindVertexArray(computeVA4)
+        gl.uniform1i(computeProgLocs4.computeTex, 0)
+        gl.uniform1f(computeProgLocs4.time, time)
+        gl.uniform1f(computeProgLocs4.mu, parameter.value.mu)
+        gl.uniform1f(computeProgLocs4.gamma, parameter.value.gamma)
+        gl.uniform1f(computeProgLocs4.sigma, parameter.value.sigma)
+        gl.uniform1i(computeProgLocs4.computeRadius, app.value.computeRadius)
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
+        gl.bindTexture(gl.TEXTURE_2D, tex)
+
+        const before = window.performance.now()
+        gl.drawArrays(gl.TRIANGLES, 0, 6)
+        const after = window.performance.now()
+        profile[3] += after - before
+      }
 
       //--------------------------------
       // (experimental)
@@ -395,13 +421,18 @@ onMounted(() => {
 
     gl.clearColor(0, 0, 0, 1)
     gl.clear(gl.COLOR_BUFFER_BIT)
+
+    const before = window.performance.now()
     gl.drawArrays(gl.TRIANGLES, 0, 6)
+    const after = window.performance.now()
+    profile[4] += after - before
 
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
 
     // Next frame
     window.requestAnimationFrame(render)
+    // console.log(profile)
   }
 
   window.requestAnimationFrame(render)
