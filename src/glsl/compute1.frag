@@ -50,7 +50,6 @@ int rotationOffset(ivec2 pos) {
 
 void main() {
     ivec2 pos = ivec2(gl_FragCoord.xy);
-    // ivec2 pos = ivec2(floor(gl_FragCoord.xy));
     ivec2 center = ivec2(computeRadius);
     ivec2 posCenter = pos - center;
     vec4 current = texelFetch(computeTex, pos, 0);
@@ -61,7 +60,7 @@ void main() {
     }
     if(current.x < 0.5f) {
         float d = current.w;
-        int o = rotationOffset(pos);
+        int o = rotationOffset(posCenter);
         for(int i = 0; i < 6; i++) {
             ivec2 nextPos = pos + nei[(o + i) % 6];
             if(outOfRange(nextPos)) {
@@ -69,7 +68,7 @@ void main() {
             }
             vec4 value = getValue(computeTex, nextPos);
             if(value.x > 0.5f) {
-                // d += current.w;
+                d += current.w;
             } else {
                 d += value.w;
             }

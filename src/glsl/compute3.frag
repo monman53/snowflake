@@ -88,8 +88,6 @@ void main() {
     ivec2 posCenter = pos - center;
     vec4 current = texelFetch(computeTex, pos, 0);
     vec4 next = current;
-    outColor = next;
-    return;
     if(abs(posCenter.x + posCenter.y) > computeRadius) {
         outColor = next;
         return;
