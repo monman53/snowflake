@@ -12,9 +12,8 @@ export const app = ref({
   pause: false,
   iteration: 0,
   iterPerFrame: 32,
-  // useMaxIter: true,
   useMaxIter: false,
-  maxIter: 10,
+  maxIter: 15000,
   fps: 0
 })
 
