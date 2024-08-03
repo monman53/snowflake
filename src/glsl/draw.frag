@@ -68,24 +68,51 @@ vec3 hsl2rgb(float h, float s, float l) {
 }
 
 vec4 getValue(vec2 fragCoord) {
-    vec2 fragPos = fragCoord - vec2(canvasSize / 2);
-    float angle = rot * M_PI * 2.f;
-    float co = cos(angle);
-    float si = sin(angle);
-    mat2 rot = mat2(co, -si, si, co);
-    fragPos = rot * fragPos;
-    fragPos.y *= 2.0f / sqrt(3.0f);
-    fragPos.x -= fragPos.y * 0.5f;
-    vec2 pos = vec2(fragPos + float(computeRadius));
-    // ivec2 ipos = ivec2(pos);
-    // vec4 value = texelFetch(computeTex, ipos, 0);
-    vec4 value = texture(computeTex, pos / float(computeRadius * 2 + 1));
+    // vec2 fragPos = fragCoord - vec2(canvasSize / 2);
+    // float angle = rot * M_PI * 2.f;
+    // float co = cos(angle);
+    // float si = sin(angle);
+    // mat2 rot = mat2(co, -si, si, co);
+    // fragPos = rot * fragPos;
+    // fragPos.y *= 2.0f / sqrt(3.0f);
+    // fragPos.x -= fragPos.y * 0.5f;
+    // vec2 pos = vec2(fragPos + float(computeRadius));
+    vec2 pos = fragCoord.xy;
+    ivec2 ipos = ivec2(pos);
+    {
+        ivec2 iposCenter = ipos - computeRadius;
+        int q = iposCenter.x;
+        int r = iposCenter.y;
+        int s = -(q + r);
+        int q2 = -r;
+        int r2 = -s;
+        int s2 = -q;
+        ivec2 iposCenter2 = ivec2(q2, r2);
+        ivec2 ipos2 = iposCenter2 + computeRadius;
+
+        vec4 value = texelFetch(computeTex, ipos, 0);
+        vec4 value2 = texelFetch(computeTex, ipos2, 0);
+        if(value != value2) {
+            return vec4(0, 1, 0, value.w);
+        }
+    }
+    vec4 value = texelFetch(computeTex, ipos, 0);
+    // vec4 value = texture(computeTex, pos / float(computeRadius * 2 + 1));
     return value;
 }
 
 vec3 getColor(vec2 pos) {
     vec2 posCenter = pos - vec2(canvasSize / 2);
     vec4 value = getValue(pos);
+    // return vec3(value.w);
+    if(pos.x < vec2(computeRadius * 2 + 1).x && pos.y < vec2(computeRadius * 2 + 1).y && value.y == 1.0f) {
+        // return vec3(1.0f, 0.5f, 0.5f);
+        return vec3(1.0f, 0.0f, value.w);
+    }
+    // if(value.x > 0.5f) {
+    //     return vec3(0.5f, 1.0f, 0.5f);
+    // }
+    // return hsl2rgb(fract(value.w * 2.f), 1.0f, 0.5f);
     vec4 gradX, gradY;
     float coef2 = 0.2f;
     // float coef2 = 0.f;

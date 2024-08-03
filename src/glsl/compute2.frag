@@ -43,6 +43,8 @@ void main() {
     ivec2 posCenter = pos - center;
     vec4 current = texelFetch(computeTex, pos, 0);
     vec4 next = current;
+    outColor = next;
+    return;
     if(abs(posCenter.x + posCenter.y) > computeRadius) {
         outColor = next;
         return;
@@ -50,9 +52,9 @@ void main() {
     if(current.x < 0.5f) {
         int na = countA(computeTex, pos);
         if(na > 0) {
-            next.y = current.y + (1.f - kappa) * current.w;
-            next.z = current.z + kappa * current.w;
-            next.w = 0.f;
+            // next.y = current.y + (1.f - kappa) * current.w;
+            // next.z = current.z + kappa * current.w;
+            // next.w = 0.f;
         }
     }
     outColor = next;

@@ -270,6 +270,7 @@ onMounted(() => {
       gl.uniform1i(computeProgLocs0.computeRadius, app.value.computeRadius)
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
       gl.drawArrays(gl.TRIANGLES, 0, 6)
+      gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0)
 
       app.value.iteration = 0
       app.value.reset = false
@@ -304,6 +305,8 @@ onMounted(() => {
         profile[0] += after - before
       }
 
+      gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0)
+
       //--------------------------------
       // (2)
       //--------------------------------
@@ -324,6 +327,7 @@ onMounted(() => {
         const after = window.performance.now()
         profile[1] += after - before
       }
+      gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0)
 
       //--------------------------------
       // (3)
@@ -347,6 +351,7 @@ onMounted(() => {
         const after = window.performance.now()
         profile[2] += after - before
       }
+      gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0)
 
       //--------------------------------
       // (4), (5)
@@ -370,6 +375,7 @@ onMounted(() => {
         const after = window.performance.now()
         profile[3] += after - before
       }
+      gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0)
 
       //--------------------------------
       // (experimental)
@@ -426,6 +432,7 @@ onMounted(() => {
     gl.drawArrays(gl.TRIANGLES, 0, 6)
     const after = window.performance.now()
     profile[4] += after - before
+    gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0)
 
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
