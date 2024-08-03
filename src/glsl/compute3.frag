@@ -24,11 +24,19 @@ vec4 getValue(sampler2D texture, ivec2 pos) {
     return texelFetch(texture, pos, 0);
 }
 
-ivec2 nei[7] = ivec2[](ivec2(0, 0), ivec2(1, 0), ivec2(0, 1), ivec2(-1, 1), ivec2(-1, 0), ivec2(0, -1), ivec2(1, -1));
+ivec2 nei[6] = ivec2[](ivec2(1, 0), ivec2(0, 1), ivec2(-1, 1), ivec2(-1, 0), ivec2(0, -1), ivec2(1, -1));
 
 int countA(sampler2D texture, ivec2 pos) {
     int count = 0;
-    for(int i = 0; i < 7; i++) {
+
+    if(getValue(texture, pos).x > 0.5f) {
+        count++;
+    }
+
+    for(int i = 0; i < 6; i++) {
+        if(outOfRange(pos + nei[i])) {
+            continue;
+        }
         if(getValue(texture, pos + nei[i]).x > 0.5f) {
             count++;
         }
@@ -36,10 +44,36 @@ int countA(sampler2D texture, ivec2 pos) {
     return count;
 }
 
+int rotationOffset(ivec2 pos) {
+    int x = pos.x;
+    int y = pos.y;
+    if(x > 0 && y >= 0) {
+        return 0;
+    }
+    if(x <= 0 && y > 0 && -x < y) {
+        return 1;
+    }
+    if(x <= 0 && y > 0 && -x >= y) {
+        return 2;
+    }
+    if(x < 0 && y <= 0) {
+        return 3;
+    }
+    if(x >= 0 && y < 0 && x < -y) {
+        return 4;
+    }
+    if(x >= 0 && y < 0 && x >= -y) {
+        return 5;
+    }
+    // Must be center of grid (x == 0 && y == 0)
+    return 0;
+}
+
 vec4 sum(sampler2D texture, ivec2 pos) {
-    vec4 sum = vec4(0.f);
-    for(int i = 0; i < 7; i++) {
-        ivec2 nextPos = pos + nei[i];
+    vec4 sum = getValue(texture, pos);
+    int o = rotationOffset(pos - computeRadius);
+    for(int i = 0; i < 6; i++) {
+        ivec2 nextPos = pos + nei[(i + o) % 6];
         if(outOfRange(nextPos)) {
             nextPos = pos;
         }
@@ -66,7 +100,7 @@ void main() {
                     next.x = 1.0f;
                 }
             }
-            if(na >= 3) {
+            if(na == 3) {
                 if(current.y >= 1.f) {
                     next.x = 1.0f;
                 }
